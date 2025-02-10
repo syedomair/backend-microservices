@@ -1,0 +1,50 @@
+basePath: /api/v1
+host: localhost:8080
+info:
+  contact:
+    email: support@example.com
+    name: API Support
+  description: This is a backend service for managing users.
+  license:
+    name: Apache 2.0
+    url: http://www.apache.org/licenses/LICENSE-2.0.html
+  termsOfService: http://swagger.io/terms/
+  title: User Service API
+  version: "1.0"
+paths:
+  /:
+    get:
+      description: Initializes the server, sets up dependencies, and starts the HTTP
+        server.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Server started successfully
+          schema:
+            type: string
+        "500":
+          description: Server initialization failed
+          schema:
+            type: string
+      summary: Start the User Service
+      tags:
+      - server
+  /run:
+    post:
+      description: Starts the HTTP server and handles graceful shutdown.
+      produces:
+      - application/json
+      responses:
+        "200":
+          description: Server stopped successfully
+          schema:
+            type: string
+        "500":
+          description: Server shutdown failed
+          schema:
+            type: string
+      summary: Run the HTTP server
+      tags:
+      - server
+swagger: "2.0"

@@ -1,0 +1,25 @@
+{
+    "level": "debug",
+    "encoding": "json",
+    "outputPaths": [
+        "stdout"
+    ],
+    "errorOutputPaths": [
+        "stderr"
+    ],
+    "encoderConfig": {
+        "messageKey": "message",
+        "levelKey": "level",
+        "levelEncoder": "lowercase",
+        "timeKey": "timestamp",
+        "timeEncoder": "iso8601",
+        "callerKey": "caller",
+        "callerEncoder": "short",
+        "stacktraceKey": "stacktrace",
+        "stacktraceEncoder": "full"
+    },
+    "initialFields": {
+        "service": "user-service",
+        "environment": "production"
+    }
+}

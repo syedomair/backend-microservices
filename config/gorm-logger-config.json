@@ -1,0 +1,7 @@
+{
+    "slow_threshold": 0,
+    "colorful": true,
+    "ignore_record_not_found_error": false,
+    "parameterized_queries": false,
+    "Log_level": 4
+}
