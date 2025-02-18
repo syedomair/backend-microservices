@@ -1,24 +1,24 @@
 package main
 
 import (
-	"backend/lib/router"
-	"backend/service/user_service/user"
-
-	"backend/lib/container"
+	"github.com/syedomair/backend-example/lib/container"
+	"github.com/syedomair/backend-example/lib/router"
+	"github.com/syedomair/backend-example/service/user_service/user"
 )
 
 func EndPointConf(c container.Container) []router.EndPoint {
-	actionController := user.Controller{
+
+	userController := user.Controller{
 		Logger: c.Logger(),
 		Repo:   user.NewPostgresRepository(c.Db(), c.Logger()),
 	}
 
 	return []router.EndPoint{
 		{
-			Name:        "GetAllActionsByTask",
+			Name:        "GetAllUser",
 			Method:      router.Get,
-			Pattern:     "/actions",
-			HandlerFunc: actionController.GetAllActions,
+			Pattern:     "/users",
+			HandlerFunc: userController.GetAllUsers,
 		},
 	}
 }

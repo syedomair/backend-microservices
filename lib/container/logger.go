@@ -1,4 +1,4 @@
-package logger
+package container
 
 import (
 	"encoding/json"
@@ -8,7 +8,7 @@ import (
 	"go.uber.org/zap"
 )
 
-func New(zapConfig string) (*zap.Logger, error) {
+func NewLogger(zapConfig string) (*zap.Logger, error) {
 
 	logger := &zap.Logger{}
 	file, err := os.Open(zapConfig)

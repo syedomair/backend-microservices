@@ -1,0 +1,13 @@
+
+1. login to psql
+psql -U dbadmin workflow
+
+2. create database
+CREATE DATABASE hr_db;
+
+3. connect to the newly created database
+\c hr_db
+
+4 run script from inside psql
+\i db_script.sql
+

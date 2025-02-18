@@ -7,24 +7,18 @@ import (
 	"go.uber.org/zap"
 )
 
-/*
-const (
-	errorCodePrefix = "6"
-)
-*/
-
 const (
 	Success = "success"
 	Failure = "failure"
 )
 
 // ErrorResponseHelper func
-func ErrorResponseHelper(requestID, methodName string, logger *zap.Logger,
-	w http.ResponseWriter, errorCode string, errorMessage string, httpStatus int) {
+func ErrorResponseHelper(methodName string, logger *zap.Logger,
+	w http.ResponseWriter, errorMessage string, httpStatus int) {
 	w.Header().Set("Content-Type", "application/json;charset=utf-8")
 	w.WriteHeader(httpStatus)
-	w.Write(errorResponse(errorCode, errorMessage))
-	logger.Debug(requestID, zap.String("M", methodName), zap.String("EC", errorCode), zap.String("MM", errorMessage))
+	w.Write(errorResponse(errorMessage))
+	logger.Debug("error response", zap.String("method", methodName), zap.String("error_message", errorMessage))
 }
 
 // SuccessResponseHelper func
@@ -48,8 +42,8 @@ func SuccessResponseList(w http.ResponseWriter, class interface{}, offset string
 	//c.Logger.Log("METHOD", "SuccessResponseList", "END", c.successResponse(tempResponse))
 }
 
-func errorResponse(errorCode string, message string) []byte {
-	class := map[string]string{"error_code": errorCode, "message": message}
+func errorResponse(message string) []byte {
+	class := map[string]string{"message": message}
 	return commonResponse(class, Failure)
 }
 

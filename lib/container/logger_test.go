@@ -1,4 +1,4 @@
-package logger
+package container
 
 import (
 	"os"
@@ -31,7 +31,7 @@ func TestNewLogger(t *testing.T) {
 
 	// Test case 1: Valid config file
 	t.Run("ValidConfig", func(t *testing.T) {
-		logger, err := New(tmpFile.Name())
+		logger, err := NewLogger(tmpFile.Name())
 		if err != nil {
 			t.Errorf("Expected no error, got %v", err)
 		}
@@ -42,7 +42,7 @@ func TestNewLogger(t *testing.T) {
 
 	// Test case 2: Invalid config file path
 	t.Run("InvalidConfigFilePath", func(t *testing.T) {
-		_, err := New("nonexistent.json")
+		_, err := NewLogger("nonexistent.json")
 		if err == nil {
 			t.Error("Expected an error for invalid config file path, got nil")
 		}
@@ -71,7 +71,7 @@ func TestNewLogger(t *testing.T) {
 	}
 
 	t.Run("InvalidJSONConfig", func(t *testing.T) {
-		_, err := New(tmpFileInvalid.Name())
+		_, err := NewLogger(tmpFileInvalid.Name())
 		if err == nil {
 			t.Error("Expected an error for invalid JSON config, got nil")
 		}

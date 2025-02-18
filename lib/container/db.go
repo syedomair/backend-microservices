@@ -1,7 +1,6 @@
-package db
+package container
 
 import (
-	"backend/lib/envconstant"
 	"encoding/json"
 	"errors"
 	"fmt"
@@ -21,14 +20,14 @@ type Db interface {
 
 func NewDBConnectionAdapter(dbName, url string, dbMaxIdle, dbMaxOpen, dbMaxLifeTime, dbMaxIdleTime int, gormConf string) Db {
 	switch dbName {
-	case envconstant.Postgres:
+	case Postgres:
 		return &PostgresAdapter{dbUrl: url,
 			dbMaxIdle:     dbMaxIdle,
 			dbMaxOpen:     dbMaxOpen,
 			dbMaxLifeTime: dbMaxLifeTime,
 			dbMaxIdleTime: dbMaxIdleTime,
 			gormConf:      gormConf}
-	case envconstant.Mysql:
+	case Mysql:
 		return &MySQLAdapter{dbUrl: url,
 			dbMaxIdle:     dbMaxIdle,
 			dbMaxOpen:     dbMaxOpen,
