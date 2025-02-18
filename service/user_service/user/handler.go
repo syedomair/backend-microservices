@@ -1,20 +1,14 @@
 package user
 
 import (
-	"backend/lib/request"
-	"backend/lib/response"
 	"net/http"
 	"strconv"
 	"time"
 
-	"go.uber.org/zap"
-)
+	"github.com/syedomair/backend-example/lib/request"
+	"github.com/syedomair/backend-example/lib/response"
 
-const (
-	errorCodePrefix = "01"
-	actionID        = "action_id"
-	taskID          = "task_id"
-	commNameID      = "comm_name_id"
+	"go.uber.org/zap"
 )
 
 type Controller struct {
@@ -22,25 +16,23 @@ type Controller struct {
 	Repo   Repository
 }
 
-// GetAllActions Public
-func (c *Controller) GetAllActions(w http.ResponseWriter, r *http.Request) {
-	methodName := "GetAllActions"
-	c.Logger.Debug(request.GetRequestID(r), zap.String("m", methodName))
+// GetAllUsers Public
+func (c *Controller) GetAllUsers(w http.ResponseWriter, r *http.Request) {
+	methodName := "GetAllUsers"
+	c.Logger.Debug("method start", zap.String("method_name", methodName))
 	start := time.Now()
 
-	c.Repo.SetRequestID(request.GetRequestID(r))
-
-	limit, offset, orderby, sort, err := request.ValidateQueryString(r, "1000", "0", "id", "asc")
+	limit, offset, orderby, sort, err := request.ValidateQueryString(r, "1000", "0", "name", "asc")
 	if err != nil {
-		//response.ErrorResponseHelper(request.GetRequestID(r), methodName, c.Logger, w, errorCodePrefix+"116", err.Error(), http.StatusBadRequest)
+		response.ErrorResponseHelper(methodName, c.Logger, w, err.Error(), http.StatusBadRequest)
 		return
 	}
 
-	actions, count, err := c.Repo.GetAllActionDB(limit, offset, orderby, sort)
+	actions, count, err := c.Repo.GetAllUserDB(limit, offset, orderby, sort)
 	if err != nil {
-		//response.ErrorResponseHelper(request.GetRequestID(r), methodName, c.Logger, w, errorCodePrefix+"117", err.Error(), http.StatusInternalServerError)
+		response.ErrorResponseHelper(methodName, c.Logger, w, err.Error(), http.StatusInternalServerError)
 		return
 	}
-	c.Logger.Debug(request.GetRequestID(r), zap.String("m", methodName), zap.Duration("since", time.Since(start)))
+	c.Logger.Debug("method end", zap.String("method_name", methodName), zap.Duration("since", time.Since(start)))
 	response.SuccessResponseList(w, actions, strconv.Itoa(offset), strconv.Itoa(limit), count)
 }

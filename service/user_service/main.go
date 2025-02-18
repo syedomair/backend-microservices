@@ -1,9 +1,6 @@
 package main
 
 import (
-	"backend/lib/container"
-	"backend/lib/envconstant"
-	"backend/lib/router"
 	"context"
 	"fmt"
 	"net/http"
@@ -13,23 +10,27 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/syedomair/backend-example/lib/container"
+	"github.com/syedomair/backend-example/lib/router"
+
 	"github.com/go-chi/chi"
 	"go.uber.org/zap"
 )
 
 func main() {
 	c, err := container.New(map[string]string{
-		envconstant.LogLevelEnvVar:      os.Getenv(envconstant.LogLevelEnvVar),
-		envconstant.DatabaseURLEnvVar:   os.Getenv(envconstant.DatabaseURLEnvVar),
-		envconstant.PortEnvVar:          os.Getenv(envconstant.PortEnvVar),
-		envconstant.DBMaxIdleEnvVar:     os.Getenv(envconstant.DBMaxIdleEnvVar),
-		envconstant.DBMaxOpenEnvVar:     os.Getenv(envconstant.DBMaxOpenEnvVar),
-		envconstant.DBMaxLifeTimeEnvVar: os.Getenv(envconstant.DBMaxLifeTimeEnvVar),
-		envconstant.DBMaxIdleTimeEnvVar: os.Getenv(envconstant.DBMaxIdleTimeEnvVar),
-		envconstant.ZapConf:             os.Getenv(envconstant.ZapConf),
-		envconstant.GormConf:            os.Getenv(envconstant.GormConf),
-		envconstant.PprofEnable:         os.Getenv(envconstant.PprofEnable),
+		container.LogLevelEnvVar:      os.Getenv(container.LogLevelEnvVar),
+		container.DatabaseURLEnvVar:   os.Getenv(container.DatabaseURLEnvVar),
+		container.PortEnvVar:          os.Getenv(container.PortEnvVar),
+		container.DBMaxIdleEnvVar:     os.Getenv(container.DBMaxIdleEnvVar),
+		container.DBMaxOpenEnvVar:     os.Getenv(container.DBMaxOpenEnvVar),
+		container.DBMaxLifeTimeEnvVar: os.Getenv(container.DBMaxLifeTimeEnvVar),
+		container.DBMaxIdleTimeEnvVar: os.Getenv(container.DBMaxIdleTimeEnvVar),
+		container.ZapConf:             os.Getenv(container.ZapConf),
+		container.GormConf:            os.Getenv(container.GormConf),
+		container.PprofEnable:         os.Getenv(container.PprofEnable),
 	})
+	fmt.Println("var in main", container.DBMaxIdleEnvVar, os.Getenv(container.DBMaxIdleEnvVar))
 	if err != nil {
 		defer func() {
 			fmt.Println("server initialization failed error: %w", err)

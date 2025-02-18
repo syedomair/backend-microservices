@@ -1,7 +1,6 @@
-package db
+package container
 
 import (
-	"backend/lib/envconstant"
 	"errors"
 	"os"
 	"testing"
@@ -28,7 +27,7 @@ func TestPostgresAdapter_MakeConnection(t *testing.T) {
 	}{
 		{
 			name:        "Successful connection",
-			dbUrl:       os.Getenv(envconstant.DatabaseURLEnvVar),
+			dbUrl:       os.Getenv(DatabaseURLEnvVar),
 			expectedErr: nil,
 		},
 		{
@@ -71,7 +70,7 @@ func TestMySQLAdapter_MakeConnection(t *testing.T) {
 		/*
 			{
 				name:        "Successful connection",
-				dbUrl:       os.Getenv(envconstant.DatabaseURLEnvVar),
+				dbUrl:       os.Getenv(DatabaseURLEnvVar),
 				expectedErr: nil,
 			},
 		*/
@@ -113,13 +112,13 @@ func TestNewDBConnectionAdapter(t *testing.T) {
 	}{
 		{
 			name:     "Postgres adapter",
-			dbName:   envconstant.Postgres,
+			dbName:   Postgres,
 			expected: &PostgresAdapter{},
 		},
 		/*
 			{
 				name:     "MySQL adapter",
-				dbName:   envconstant.Mysql,
+				dbName:   Mysql,
 				expected: &MySQLAdapter{},
 			},
 		*/
@@ -135,11 +134,11 @@ func TestNewDBConnectionAdapter(t *testing.T) {
 			adapter := NewDBConnectionAdapter(tt.dbName, "url", 10, 100, 1, 10, "")
 			switch adapter.(type) {
 			case *PostgresAdapter:
-				if tt.dbName != envconstant.Postgres && tt.dbName != "unknown" {
+				if tt.dbName != Postgres && tt.dbName != "unknown" {
 					t.Errorf("NewDBConnectionAdapter() returned unexpected adapter type for dbName %v", tt.dbName)
 				}
 			case *MySQLAdapter:
-				if tt.dbName != envconstant.Mysql {
+				if tt.dbName != Mysql {
 					t.Errorf("NewDBConnectionAdapter() returned unexpected adapter type for dbName %v", tt.dbName)
 				}
 			default:
@@ -159,8 +158,8 @@ func TestMakeConnection(t *testing.T) {
 	}{
 		{
 			name:        "Successful connection",
-			dialector:   postgres.Open(os.Getenv(envconstant.DatabaseURLEnvVar)),
-			dbUrl:       os.Getenv(envconstant.DatabaseURLEnvVar),
+			dialector:   postgres.Open(os.Getenv(DatabaseURLEnvVar)),
+			dbUrl:       os.Getenv(DatabaseURLEnvVar),
 			expectedErr: nil,
 		},
 		{

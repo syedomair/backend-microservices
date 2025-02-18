@@ -1,9 +1,8 @@
 package user
 
-import "backend/models"
+import "github.com/syedomair/backend-example/models"
 
 // Repository interface
 type Repository interface {
-	SetRequestID(requestID string)
-	GetAllActionDB(limit int, offset int, orderby string, sort string) ([]*models.Action, string, error)
+	GetAllUserDB(limit int, offset int, orderby string, sort string) ([]*models.User, string, error)
 }
