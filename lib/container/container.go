@@ -160,7 +160,6 @@ func New(envVars map[string]string) (Container, error) {
 		requiredKeysSlice = append(requiredKeysSlice, key)
 	}
 	if err := validateEnvVars(envVars, requiredKeysSlice); err != nil {
-		fmt.Println("validateEnvVarr error", envVars, requiredKeys)
 		return &container{environmentVariables: envVars}, err
 	}
 	c := &container{environmentVariables: envVars}
