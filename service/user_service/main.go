@@ -30,7 +30,6 @@ func main() {
 		container.GormConf:            os.Getenv(container.GormConf),
 		container.PprofEnable:         os.Getenv(container.PprofEnable),
 	})
-	fmt.Println("var in main", container.DBMaxIdleEnvVar, os.Getenv(container.DBMaxIdleEnvVar))
 	if err != nil {
 		defer func() {
 			fmt.Println("server initialization failed error: %w", err)

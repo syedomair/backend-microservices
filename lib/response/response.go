@@ -27,19 +27,19 @@ func SuccessResponseHelper(w http.ResponseWriter, class interface{}, httpStatus 
 	w.Header().Set("Access-Control-Allow-Origin", "*")
 	w.WriteHeader(httpStatus)
 	w.Write(successResponse(class))
-	//c.Logger.Log("METHOD", "SuccessResponseHelper", "END", c.successResponse(class))
 }
 
 // SuccessResponseList func
 func SuccessResponseList(w http.ResponseWriter, class interface{}, offset string, limit string, count string) {
 	tempResponse := make(map[string]interface{})
 	tempResponse["count"] = count
+	tempResponse["offset"] = offset
+	tempResponse["limit"] = limit
 	tempResponse["list"] = class
 
 	w.Header().Set("Content-Type", "application/json")
 	w.WriteHeader(http.StatusOK)
 	w.Write(successResponse(tempResponse))
-	//c.Logger.Log("METHOD", "SuccessResponseList", "END", c.successResponse(tempResponse))
 }
 
 func errorResponse(message string) []byte {

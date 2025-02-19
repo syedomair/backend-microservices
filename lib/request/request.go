@@ -6,33 +6,6 @@ import (
 	"strconv"
 )
 
-const (
-	errorCodePrefix = "5"
-)
-
-const (
-	SUCCESS = "success"
-	FAILURE = "failure"
-	//ERROR_UNEXPECTED = "Unexpected Error."
-	STRING_SMALL    = "STRING_SMALL"
-	STRING_LARGE    = "STRING_LARGE"
-	STRING_EMAIL    = "STRING_EMAIL"
-	STRING_PASSWORD = "STRING_PASSWORD"
-	STRING_DATE     = "STRING_DATE"
-	STRING_DATETIME = "STRING_DATETIME"
-	INT             = "INT"
-	INT_BOOLEAN     = "INT_BOOLEAN"
-	ID              = "ID"
-	EMAIL           = "EMAIL"
-	PASSWORD        = "PASSWORD"
-)
-
-// GetRequestID Public
-func GetRequestID(r *http.Request) string {
-	requestID, _ := r.Context().Value("ContextKeyRequestID").(string)
-	return requestID
-}
-
 // ValidateQueryString Public
 func ValidateQueryString(r *http.Request, defaultLimit string, defaultPage string, defaultOrderby string, defaultSort string) (int, int, string, string, error) {
 
