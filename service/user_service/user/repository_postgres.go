@@ -25,6 +25,7 @@ func (p *postgresRepo) GetAllUserDB(limit int, offset int, orderby string, sort 
 	methodName := "GetAllUserDB"
 	p.logger.Debug("method start", zap.String("method_name", methodName))
 	start := time.Now()
+
 	users := []*models.User{}
 	count := int64(0)
 	if err := p.client.Table("public.user").
@@ -32,7 +33,6 @@ func (p *postgresRepo) GetAllUserDB(limit int, offset int, orderby string, sort 
 		Limit(limit).
 		Offset(offset).
 		Order(orderby).
-		Count(&count).
 		Scan(&users).Count(&count).Error; err != nil {
 		return nil, "", err
 	}
