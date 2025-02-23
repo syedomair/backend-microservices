@@ -11,6 +11,7 @@ import (
 	"testing"
 
 	_ "github.com/lib/pq"
+	"github.com/stretchr/testify/assert"
 	"github.com/syedomair/backend-example/lib/container"
 	"github.com/syedomair/backend-example/service/user_service/user"
 	"github.com/testcontainers/testcontainers-go"
@@ -122,7 +123,7 @@ func setupTestDB(t *testing.T) container.Container {
 
 func runMigrations(db *sql.DB) error {
 	// Read and execute your schema.sql
-	schema, err := os.ReadFile("../../database/table_script.sql")
+	schema, err := os.ReadFile("../../database/migration.sql")
 	if err != nil {
 		return err
 	}
@@ -148,5 +149,9 @@ func TestUserRepo(t *testing.T) {
 
 	users, count, err := userRepo.GetAllUserDB(limit, offset, orderby, sort)
 
-	fmt.Println(users[0].Name, count, err)
+	// Assertions
+	assert.NoError(t, err)
+	assert.Equal(t, 9, len(users))
+	assert.Equal(t, "9", count)
+
 }
