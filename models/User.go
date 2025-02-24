@@ -14,3 +14,14 @@ type User struct {
 func (User) TableName() string {
 	return "public.user"
 }
+
+type ResponseUser struct {
+	HighAge    string      `json:"high_age" `
+	LowAge     string      `json:"low_age" `
+	AvgAge     string      `json:"avg_age" `
+	HighSalary string      `json:"high_salary" `
+	LowSalary  string      `json:"low_salary" `
+	AvgSalary  string      `json:"avg_salary" `
+	Count      string      `json:"count" `
+	List       interface{} `json:"list" `
+}

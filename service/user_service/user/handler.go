@@ -7,6 +7,7 @@ import (
 	"strconv"
 	"time"
 
+	"github.com/mitchellh/mapstructure"
 	"github.com/syedomair/backend-example/lib/request"
 	"github.com/syedomair/backend-example/lib/response"
 	"github.com/syedomair/backend-example/models"
@@ -32,7 +33,7 @@ func (c *Controller) GetAllUsers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	responseObj, err := c.getAllUsersData(limit, offset, orderBy, sort)
+	responseObj, err := c.GetAllUsersData(limit, offset, orderBy, sort)
 	if err != nil {
 		c.handleError(methodName, w, err, http.StatusBadRequest)
 		return
@@ -48,9 +49,9 @@ func (c *Controller) handleError(methodName string, w http.ResponseWriter, err e
 	response.ErrorResponseHelper(methodName, c.Logger, w, err.Error(), statusCode)
 }
 
-// getAllUsersData fetches user data and statistics concurrently.
-func (c *Controller) getAllUsersData(limit, offset int, orderBy, sort string) (map[string]interface{}, error) {
-	methodName := "GetAllUsers"
+// GetAllUsersData fetches user data and statistics concurrently.
+func (c *Controller) GetAllUsersData(limit, offset int, orderBy, sort string) (map[string]interface{}, error) {
+	methodName := "GetAllUsersData"
 	c.Logger.Debug("method start", zap.String("method", methodName))
 	start := time.Now()
 	//ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
@@ -135,16 +136,21 @@ func (c *Controller) getAllUsersData(limit, offset int, orderBy, sort string) (m
 	if err := g.Wait(); err != nil {
 		return nil, err
 	}
+	responseUserObj := models.ResponseUser{
+		HighAge:    strconv.Itoa(intUserHighAge),
+		LowAge:     strconv.Itoa(intUserLowAge),
+		AvgAge:     fmt.Sprintf("%.2f", fltUserAvgAge),
+		HighSalary: fmt.Sprintf("%.2f", fltUserHighSalary),
+		LowSalary:  fmt.Sprintf("%.2f", fltUserLowSalary),
+		AvgSalary:  fmt.Sprintf("%.2f", fltUserAvgSalary),
+		Count:      count,
+		List:       userList,
+	}
 
-	responseObj := map[string]interface{}{
-		"high_age":    strconv.Itoa(intUserHighAge),
-		"low_age":     strconv.Itoa(intUserLowAge),
-		"avg_age":     fmt.Sprintf("%.2f", fltUserAvgAge),
-		"high_salary": fmt.Sprintf("%.2f", fltUserHighSalary),
-		"low_salary":  fmt.Sprintf("%.2f", fltUserLowSalary),
-		"avg_salary":  fmt.Sprintf("%.2f", fltUserAvgSalary),
-		"count":       count,
-		"list":        userList,
+	var responseObj map[string]interface{}
+	err := mapstructure.Decode(responseUserObj, &responseObj)
+	if err != nil {
+		return nil, err
 	}
 
 	c.Logger.Debug("method end", zap.String("method", methodName), zap.Duration("duration", time.Since(start)))

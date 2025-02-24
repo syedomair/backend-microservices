@@ -16,6 +16,7 @@ import (
 	"github.com/syedomair/backend-example/service/user_service/user"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
+	"go.uber.org/zap"
 )
 
 func TestMain(m *testing.M) {
@@ -153,5 +154,26 @@ func TestUserRepo(t *testing.T) {
 	assert.NoError(t, err)
 	assert.Equal(t, 9, len(users))
 	assert.Equal(t, "9", count)
+
+	mockRepo := userRepo
+	mockLogger := zap.NewNop()
+
+	controller := &user.Controller{
+		Repo:   mockRepo,
+		Logger: mockLogger,
+	}
+
+	result, err := controller.GetAllUsersData(10, 0, "name", "asc")
+
+	assert.NoError(t, err)
+	assert.Equal(t, 8, len(result))
+
+	assert.Equal(t, "40", result["HighAge"].(string))
+	assert.Equal(t, "22", result["LowAge"].(string))
+	assert.Equal(t, "90000.00", result["HighSalary"].(string))
+	assert.Equal(t, "48000.00", result["LowSalary"].(string))
+	assert.Equal(t, "31.22", result["AvgAge"].(string))
+	assert.Equal(t, "68333.33", result["AvgSalary"].(string))
+	assert.Equal(t, "9", result["Count"].(string))
 
 }
