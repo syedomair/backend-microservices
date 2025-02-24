@@ -48,14 +48,14 @@ func TestController_GetAllUsersData(t *testing.T) {
 				mr.EXPECT().GetUserAvgSalary().Return(75000.0, nil).AnyTimes()
 			},
 			expectedResult: map[string]interface{}{
-				"high_age":    "30",
-				"low_age":     "20",
-				"avg_age":     "25.00",
-				"high_salary": "100000.00",
-				"low_salary":  "50000.00",
-				"avg_salary":  "75000.00",
-				"count":       "1",
-				"list":        []*models.User{{ID: "1", Name: "John"}},
+				"HighAge":    "30",
+				"LowAge":     "20",
+				"AvgAge":     "25.00",
+				"HighSalary": "100000.00",
+				"LowSalary":  "50000.00",
+				"AvgSalary":  "75000.00",
+				"Count":      "1",
+				"List":       []*models.User{{ID: "1", Name: "John"}},
 			},
 			expectedError: nil,
 		},
@@ -67,7 +67,7 @@ func TestController_GetAllUsersData(t *testing.T) {
 			tt.mockSetup(mockRepo)
 
 			// Call the method under test
-			result, err := controller.getAllUsersData(tt.limit, tt.offset, tt.orderBy, tt.sort)
+			result, err := controller.GetAllUsersData(tt.limit, tt.offset, tt.orderBy, tt.sort)
 
 			// Verify the error
 			if tt.expectedError != nil {
@@ -86,7 +86,7 @@ func TestController_GetAllUsersData(t *testing.T) {
 					t.Errorf("expected result: %v, got: %v", tt.expectedResult, result)
 				} else {
 					for key, expectedValue := range tt.expectedResult {
-						if key != "list" {
+						if key != "List" {
 							actualValue := result[key]
 							if fmt.Sprintf("%v", actualValue) != fmt.Sprintf("%v", expectedValue) {
 								t.Errorf("expected %s: %v, got: %v", key, expectedValue, actualValue)
