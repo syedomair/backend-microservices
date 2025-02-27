@@ -1,0 +1,31 @@
+name: Deploy to AWS ECS Fargate
+
+on:
+  push:
+    branches:
+      - main
+
+jobs:
+  deploy:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout repository
+        uses: actions/checkout@v4
+
+      - name: Configure AWS credentials via OIDC
+        uses: aws-actions/configure-aws-credentials@v3
+        with:
+          role-to-assume: arn:aws:iam::175716812235:role/github-role
+          role-session-name: GitHubActionsSession
+          aws-region: us-east-2
+
+      - name: Verify AWS identity
+        run: aws sts get-caller-identity
+
+      - name: Login to AWS ECR
+        uses: docker/login-action@v2
+
+      - name: Build and push Docker images
+        run: |
+          docker compose build
+          docker compose push
