@@ -4,7 +4,7 @@ import (
 	"strconv"
 	"time"
 
-	"github.com/syedomair/backend-example/models"
+	"github.com/syedomair/backend-microservices/models"
 
 	"go.uber.org/zap"
 	"gorm.io/gorm"

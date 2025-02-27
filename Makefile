@@ -6,6 +6,9 @@ export
 run_user:
 	go run service/user_service/main.go service/user_service/endpoints.go
 
+run_dept:
+	go run service/department_service/main.go service/department_service/endpoints.go
+
 build_user-srv-docker:
 	docker build --progress=plain --no-cache -f service/user_service/Dockerfile -t backend/user-srv-api:latest  \
 	--build-arg logLevelEnvVar=$(LOG_LEVEL) \

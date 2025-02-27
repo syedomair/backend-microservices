@@ -12,7 +12,7 @@ package user
 import (
 	reflect "reflect"
 
-	models "github.com/syedomair/backend-example/models"
+	models "github.com/syedomair/backend-microservices/models"
 	gomock "go.uber.org/mock/gomock"
 )
 

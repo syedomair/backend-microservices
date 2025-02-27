@@ -10,8 +10,8 @@ import (
 	"syscall"
 	"time"
 
-	"github.com/syedomair/backend-example/lib/container"
-	"github.com/syedomair/backend-example/lib/router"
+	"github.com/syedomair/backend-microservices/lib/container"
+	"github.com/syedomair/backend-microservices/lib/router"
 
 	"github.com/go-chi/chi"
 	"go.uber.org/zap"

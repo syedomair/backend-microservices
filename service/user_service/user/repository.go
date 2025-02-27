@@ -1,7 +1,7 @@
 package user
 
 import (
-	"github.com/syedomair/backend-example/models"
+	"github.com/syedomair/backend-microservices/models"
 )
 
 // Repository interface

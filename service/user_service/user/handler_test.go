@@ -4,7 +4,7 @@ import (
 	"fmt"
 	"testing"
 
-	"github.com/syedomair/backend-example/models"
+	"github.com/syedomair/backend-microservices/models"
 	"go.uber.org/mock/gomock"
 	"go.uber.org/zap"
 )
