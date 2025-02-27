@@ -16,22 +16,13 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
-      - name: Debug OIDC token
-        id: oidc-token
-        uses: actions/github-script@v6
-        with:
-          script: |
-            const token = await core.getIDToken('sts.amazonaws.com');
-            console.log('OIDC Token:', token);
-            core.setOutput('token', token);
-
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v3
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           role-session-name: GitHubActionsSession
           aws-region: us-east-2
-          audience: sts.amazonaws.com
+          audience: https://github.com
 
 
       - name: Build and push Docker image
