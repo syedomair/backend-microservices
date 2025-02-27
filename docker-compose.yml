@@ -39,6 +39,44 @@ services:
     depends_on:
       - db
 
+  department_service:
+    env_file: .env_docker_example
+    environment:
+      - LOG_LEVEL=${LOG_LEVEL}
+      - DATABASE_URL=${DATABASE_URL}
+      - PORT=${PORT}
+      - DB=${DB}
+      - DB_MAX_IDLE=${DB_MAX_IDLE}
+      - DB_MAX_OPEN=${DB_MAX_OPEN}
+      - DB_MAX_LIFE_TIME=${DB_MAX_LIFE_TIME}
+      - DB_MAX_IDLE_TIME=${DB_MAX_IDLE_TIME}
+      - ZAP_CONF=${ZAP_CONF}
+      - GORM_CONF=${GORM_CONF}
+      - PPROF_ENABLE=${PPROF_ENABLE}
+    build:
+      context: .
+      dockerfile: service/department_service/Dockerfile
+      no_cache: true
+      args:
+        - logLevelEnvVar=${LOG_LEVEL}
+        - databaseURLEnvVar=${DATABASE_URL}
+        - portEnvVar=${PORT}
+        - dBEnvVar=${DB}
+        - dBMaxIdleEnvVar=${DB_MAX_IDLE}
+        - dBMaxOpenEnvVar=${DB_MAX_OPEN}
+        - dBMaxLifeTimeEnvVar=${DB_MAX_LIFE_TIME}
+        - dBMaxIdleTimeEnvVar=${DB_MAX_IDLE_TIME}
+        - zapConf=${ZAP_CONF}
+        - gormConf=${GORM_CONF}
+        - pprofEnable=${PPROF_ENABLE}
+    ports:
+      - "8081:8185" 
+    volumes:
+      - /config/gorm-logger-config.json:/config/gorm-logger-config.json
+      - /config/zap-logger-config.json:/config/zap-logger-config.json
+    depends_on:
+      - db
+
   db:
     image: postgres:latest
     ports:

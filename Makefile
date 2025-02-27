@@ -1,6 +1,6 @@
 .PHONY : 
 
-include .env
+include .env_docker_example
 export
 
 
