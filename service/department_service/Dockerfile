@@ -63,7 +63,7 @@ COPY /service/department_service/endpoints.go .
 RUN go mod download
 
 # Run tests
-RUN go test ./...
+RUN go test -v ./service/department_service/...
 
 # Build the Go application
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -o department-srv-api .
