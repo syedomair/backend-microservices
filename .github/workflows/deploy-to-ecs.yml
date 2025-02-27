@@ -28,8 +28,8 @@ jobs:
       - name: Build and push Docker image
         uses: docker/build-push-action@v2
         with:
-          context: ../../service/user_service
-          dockerfile: Dockerfile
+          context: .
+          dockerfile: ../../service/user_service/Dockerfile
           push: true
           tags: 175716812235.dkr.ecr.us-east-2.amazonaws.com/backend-microservices/user-service-stage:latest
           build-args: |
