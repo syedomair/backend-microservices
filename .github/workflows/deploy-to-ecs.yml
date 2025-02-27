@@ -24,6 +24,7 @@ jobs:
           aws-region: us-east-2
           audience: sts.amazonaws.com
 
+
       - name: Build and push Docker image
         uses: docker/build-push-action@v2
         with:
