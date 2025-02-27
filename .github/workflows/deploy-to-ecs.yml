@@ -23,7 +23,9 @@ jobs:
           role-session-name: GitHubActionsSession
           aws-region: us-east-2
           audience: https://github.com
-
+          
+      - name: Print current working directory
+        run: pwd
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v2
