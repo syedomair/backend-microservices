@@ -16,13 +16,10 @@ jobs:
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v3
         with:
-          role-to-assume: arn:aws:iam::123456789012:role/GitHubActionsRole
+          role-to-assume: arn:aws:iam::175716812235:role/github-role
           role-session-name: GitHubActionsSession
           aws-region: us-east-2
 
-      - name: Login to AWS
-        uses: aws-actions/login@v1
-    
       - name: Build and push Docker image
         uses: docker/build-push-action@v2
         with:
@@ -31,14 +28,14 @@ jobs:
           push: true
           tags: 175716812235.dkr.ecr.us-east-2.amazonaws.com/backend-microservices/user-service-stage:latest
           build-args: |
-              --build-arg logLevelEnvVar=${LOG_LEVEL}
-              --build-arg databaseURLEnvVar=${DATABASE_URL}
-              --build-arg portEnvVar=${PORT}
-              --build-arg dBEnvVar=${DB}
-              --build-arg dBMaxIdleEnvVar=${DB_MAX_IDLE}
-              --build-arg dBMaxOpenEnvVar=${DB_MAX_OPEN}
-              --build-arg dBMaxLifeTimeEnvVar=${DB_MAX_LIFE_TIME}
-              --build-arg dBMaxIdleTimeEnvVar=${DB_MAX_IDLE_TIME}
-              --build-arg zapConf=${ZAP_CONF}
-              --build-arg gormConf=${GORM_CONF}
-              --build-arg pprofEnable=${PPROF_ENABLE}
+            --build-arg logLevelEnvVar=${LOG_LEVEL}
+            --build-arg databaseURLEnvVar=${DATABASE_URL}
+            --build-arg portEnvVar=${PORT}
+            --build-arg dBEnvVar=${DB}
+            --build-arg dBMaxIdleEnvVar=${DB_MAX_IDLE}
+            --build-arg dBMaxOpenEnvVar=${DB_MAX_OPEN}
+            --build-arg dBMaxLifeTimeEnvVar=${DB_MAX_LIFE_TIME}
+            --build-arg dBMaxIdleTimeEnvVar=${DB_MAX_IDLE_TIME}
+            --build-arg zapConf=${ZAP_CONF}
+            --build-arg gormConf=${GORM_CONF}
+            --build-arg pprofEnable=${PPROF_ENABLE}
