@@ -9,6 +9,9 @@ env:
 jobs:
   deploy:
     runs-on: ubuntu-latest
+    permissions:
+      id-token: write
+      contents: read
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
@@ -19,6 +22,7 @@ jobs:
           role-to-assume: arn:aws:iam::175716812235:role/github-role
           role-session-name: GitHubActionsSession
           aws-region: us-east-2
+          audience: sts.amazonaws.com
 
       - name: Build and push Docker image
         uses: docker/build-push-action@v2
