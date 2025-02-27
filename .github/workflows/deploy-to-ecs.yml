@@ -4,28 +4,41 @@ on:
   push:
     branches:
       - main
-
+env:
+  file: ../../.env_docker_example
 jobs:
   deploy:
     runs-on: ubuntu-latest
     steps:
-      - name: Checkout repository
-        uses: actions/checkout@v4
+      - name: Checkout code
+        uses: actions/checkout@v2
 
-      - name: Configure AWS credentials via OIDC
+      - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v3
         with:
-          role-to-assume: arn:aws:iam::175716812235:role/github-role
+          role-to-assume: arn:aws:iam::123456789012:role/GitHubActionsRole
           role-session-name: GitHubActionsSession
           aws-region: us-east-2
 
-      - name: Verify AWS identity
-        run: aws sts get-caller-identity
-
-      - name: Login to AWS ECR
-        uses: docker/login-action@v2
-
-      - name: Build and push Docker images
-        run: |
-          docker compose build
-          docker compose push
+      - name: Login to AWS
+        uses: aws-actions/login@v1
+    
+      - name: Build and push Docker image
+        uses: docker/build-push-action@v2
+        with:
+          context: ./../../service/user_service
+          dockerfile: Dockerfile
+          push: true
+          tags: 175716812235.dkr.ecr.us-east-2.amazonaws.com/backend-microservices/user-service-stage:latest
+          build-args: |
+              --build-arg logLevelEnvVar=${LOG_LEVEL}
+              --build-arg databaseURLEnvVar=${DATABASE_URL}
+              --build-arg portEnvVar=${PORT}
+              --build-arg dBEnvVar=${DB}
+              --build-arg dBMaxIdleEnvVar=${DB_MAX_IDLE}
+              --build-arg dBMaxOpenEnvVar=${DB_MAX_OPEN}
+              --build-arg dBMaxLifeTimeEnvVar=${DB_MAX_LIFE_TIME}
+              --build-arg dBMaxIdleTimeEnvVar=${DB_MAX_IDLE_TIME}
+              --build-arg zapConf=${ZAP_CONF}
+              --build-arg gormConf=${GORM_CONF}
+              --build-arg pprofEnable=${PPROF_ENABLE}
