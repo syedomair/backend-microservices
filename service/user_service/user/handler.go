@@ -8,9 +8,9 @@ import (
 	"time"
 
 	"github.com/mitchellh/mapstructure"
-	"github.com/syedomair/backend-example/lib/request"
-	"github.com/syedomair/backend-example/lib/response"
-	"github.com/syedomair/backend-example/models"
+	"github.com/syedomair/backend-microservices/lib/request"
+	"github.com/syedomair/backend-microservices/lib/response"
+	"github.com/syedomair/backend-microservices/models"
 	"golang.org/x/sync/errgroup"
 
 	"go.uber.org/zap"

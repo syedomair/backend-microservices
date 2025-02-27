@@ -65,7 +65,9 @@ func ValidateQueryString(r *http.Request, defaultLimit string, defaultPage strin
 		return 0, 0, "", "", errors.New("invalid 'page' number in query string. Must be a number. ")
 	}
 
-	intPage = (intLimit * intPage) - intLimit
+	if intPage != 0 {
+		intPage = (intLimit * intPage) - intLimit
+	}
 
 	if orderby != "" {
 		if _, err := strconv.Atoi(orderby); err == nil {

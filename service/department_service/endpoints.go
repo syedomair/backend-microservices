@@ -1,24 +1,24 @@
 package main
 
 import (
-	"github.com/syedomair/backend-example/lib/container"
-	"github.com/syedomair/backend-example/lib/router"
-	"github.com/syedomair/backend-example/service/user_service/user"
+	"github.com/syedomair/backend-microservices/lib/container"
+	"github.com/syedomair/backend-microservices/lib/router"
+	"github.com/syedomair/backend-microservices/service/department_service/department"
 )
 
 func EndPointConf(c container.Container) []router.EndPoint {
 
-	userController := user.Controller{
+	departmentController := department.Controller{
 		Logger: c.Logger(),
-		Repo:   user.NewPostgresRepository(c.Db(), c.Logger()),
+		Repo:   department.NewPostgresRepository(c.Db(), c.Logger()),
 	}
 
 	return []router.EndPoint{
 		{
-			Name:        "GetAllUser",
+			Name:        "GetAllDepartments",
 			Method:      router.Get,
-			Pattern:     "/users",
-			HandlerFunc: userController.GetAllUsers,
+			Pattern:     "/departments",
+			HandlerFunc: departmentController.GetAllDepartments,
 		},
 	}
 }

@@ -11,3 +11,8 @@ type Department struct {
 func (Department) TableName() string {
 	return "department"
 }
+
+type ResponseDepartment struct {
+	Count string      `json:"count" `
+	List  interface{} `json:"list" `
+}

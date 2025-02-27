@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/syedomair/backend-example/models"
+	"github.com/syedomair/backend-microservices/models"
 )
 
 type mockRepository struct {
