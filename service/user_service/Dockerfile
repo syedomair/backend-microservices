@@ -63,7 +63,7 @@ COPY /service/user_service/endpoints.go .
 RUN go mod download
 
 # Run tests
-RUN go test ./...
+RUN go test -v ./service/user_service/...
 
 # Build the Go application
 RUN CGO_ENABLED=0 GOOS=linux GOARCH=amd64 go build -a -installsuffix cgo -o user-srv-api .
