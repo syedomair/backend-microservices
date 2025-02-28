@@ -4,9 +4,6 @@ on:
   push:
     branches:
       - main
-env:
-  file: .env_docker_example
-  
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -48,19 +45,17 @@ jobs:
       - name: Build Docker Image
         run: |
           docker build \
-            --build-arg logLevelEnvVar=${LOG_LEVEL}
-            --build-arg databaseURLEnvVar=${DATABASE_URL}
-            --build-arg portEnvVar=${PORT}
-            --build-arg dBEnvVar=${DB}
-            --build-arg dBMaxIdleEnvVar=${DB_MAX_IDLE}
-            --build-arg dBMaxOpenEnvVar=${DB_MAX_OPEN}
-            --build-arg dBMaxLifeTimeEnvVar=${DB_MAX_LIFE_TIME}
-            --build-arg dBMaxIdleTimeEnvVar=${DB_MAX_IDLE_TIME}
-            --build-arg zapConf=${ZAP_CONF}
-            --build-arg gormConf=${GORM_CONF}
-            --build-arg pprofEnable=${PPROF_ENABLE}          
-            --build-arg DB_USER=${{ env.DB_USER }} \
-            --build-arg DB_PASSWORD=${{ env.DB_PASSWORD }} \
+            --build-arg logLevelEnvVar=${LOG_LEVEL} \
+            --build-arg databaseURLEnvVar=${DATABASE_URL}  \
+            --build-arg portEnvVar=${PORT} \
+            --build-arg dBEnvVar=${DB} \
+            --build-arg dBMaxIdleEnvVar=${DB_MAX_IDLE} \
+            --build-arg dBMaxOpenEnvVar=${DB_MAX_OPEN} \
+            --build-arg dBMaxLifeTimeEnvVar=${DB_MAX_LIFE_TIME} \
+            --build-arg dBMaxIdleTimeEnvVar=${DB_MAX_IDLE_TIME} \
+            --build-arg zapConf=${ZAP_CONF} \
+            --build-arg gormConf=${GORM_CONF} \
+            --build-arg pprofEnable=${PPROF_ENABLE}  \
             -t 175716812235.dkr.ecr.us-east-2.amazonaws.com/backend-microservices/user-service-stage:latest \
             -f service/user_service/Dockerfile \
             service/user_service/
