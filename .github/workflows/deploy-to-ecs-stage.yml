@@ -14,6 +14,17 @@ jobs:
       - name: Checkout code
         uses: actions/checkout@v2
 
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.23
+
+      - name: Install dependencies
+        run: go mod tidy
+
+      - name: Run Integration Tests
+        run: go test -v ./integration_test/user_test/...
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v3
         with:
