@@ -1,4 +1,4 @@
-name: Deploy to AWS ECS Fargate
+name: Deploy Department service to AWS ECR
 
 on:
   push:
@@ -44,9 +44,9 @@ jobs:
             --build-arg zapConf=${ZAP_CONF} \
             --build-arg gormConf=${GORM_CONF} \
             --build-arg pprofEnable=${PPROF_ENABLE}  \
-            -t 175716812235.dkr.ecr.us-east-2.amazonaws.com/backend-microservices/user-service-stage:latest \
-            -f service/user_service/Dockerfile  .
-          docker push 175716812235.dkr.ecr.us-east-2.amazonaws.com/backend-microservices/user-service-stage:latest
+            -t 175716812235.dkr.ecr.us-east-2.amazonaws.com/backend-microservices/department-service-stage:latest \
+            -f service/department_service/Dockerfile  .
+          docker push 175716812235.dkr.ecr.us-east-2.amazonaws.com/backend-microservices/department-service-stage:latest
 
 
    
