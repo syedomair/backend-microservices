@@ -21,8 +21,6 @@ jobs:
           role-session-name: GitHubActionsSession
           aws-region: ${{ secrets.AWS_REGION}}
           audience: https://github.com
-          
-     
     
       - name: Load Environment Variables
         run: |
@@ -45,6 +43,7 @@ jobs:
             --build-arg pprofEnable=${PPROF_ENABLE}  \
             -t 175716812235.dkr.ecr.us-east-2.amazonaws.com/backend-microservices/user-service-stage:latest \
             -f service/user_service/Dockerfile  .
+          docker push 175716812235.dkr.ecr.us-east-2.amazonaws.com/backend-microservices/user-service-stage:latest
 
 
    
