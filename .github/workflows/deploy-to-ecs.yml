@@ -32,7 +32,7 @@ jobs:
         run: echo ${{ secrets.AWS_ROLE_ARN }}
 
       - name: Print env variable region
-        run: echo ${{AWS_REGION}}
+        run: echo ${{ secrets.AWS_REGION}}
 
         
       - name: Print env variable
