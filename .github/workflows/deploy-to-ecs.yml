@@ -5,7 +5,8 @@ on:
     branches:
       - main
 env:
-  file: ../../.env_docker_example
+  file: .env_docker_example
+  
 jobs:
   deploy:
     runs-on: ubuntu-latest
@@ -21,20 +22,32 @@ jobs:
         with:
           role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
           role-session-name: GitHubActionsSession
-          aws-region: us-east-2
+          aws-region: ${{AWS_REGION}}
           audience: https://github.com
           
       - name: Print current working directory
         run: pwd
 
-      - name: Build and push Docker image
-        uses: docker/build-push-action@v2
-        with:
-          context: .
-          dockerfile: service/user_service/Dockerfile
-          push: true
-          tags: 175716812235.dkr.ecr.us-east-2.amazonaws.com/backend-microservices/user-service-stage:latest
-          build-args: |
+      - name: Print env variable role arn
+        run: echo ${{ secrets.AWS_ROLE_ARN }}
+
+      - name: Print env variable region
+        run: echo ${{AWS_REGION}}
+
+        
+      - name: Print env variable
+        run: echo $DATABASE_URL
+    
+      - name: Load Environment Variables
+        run: |
+          cat .env_docker_example >> $GITHUB_ENV
+
+      - name: Print env variable
+        run: echo $DATABASE_URL
+        
+      - name: Build Docker Image
+        run: |
+          docker build \
             --build-arg logLevelEnvVar=${LOG_LEVEL}
             --build-arg databaseURLEnvVar=${DATABASE_URL}
             --build-arg portEnvVar=${PORT}
@@ -45,4 +58,12 @@ jobs:
             --build-arg dBMaxIdleTimeEnvVar=${DB_MAX_IDLE_TIME}
             --build-arg zapConf=${ZAP_CONF}
             --build-arg gormConf=${GORM_CONF}
-            --build-arg pprofEnable=${PPROF_ENABLE}
+            --build-arg pprofEnable=${PPROF_ENABLE}          
+            --build-arg DB_USER=${{ env.DB_USER }} \
+            --build-arg DB_PASSWORD=${{ env.DB_PASSWORD }} \
+            -t 175716812235.dkr.ecr.us-east-2.amazonaws.com/backend-microservices/user-service-stage:latest \
+            -f service/user_service/Dockerfile \
+            service/user_service/
+
+
+   
