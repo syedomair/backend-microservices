@@ -22,26 +22,13 @@ jobs:
           aws-region: ${{ secrets.AWS_REGION}}
           audience: https://github.com
           
-      - name: Print current working directory
-        run: pwd
-
-      - name: Print env variable role arn
-        run: echo ${{ secrets.AWS_ROLE_ARN }}
-
-      - name: Print env variable region
-        run: echo ${{ secrets.AWS_REGION}}
-
-        
-      - name: Print env variable
-        run: echo $DATABASE_URL
+     
     
       - name: Load Environment Variables
         run: |
           cat .env_docker_example >> $GITHUB_ENV
 
-      - name: Print env variable
-        run: echo $DATABASE_URL
-        
+              
       - name: Build Docker Image
         run: |
           docker build \
@@ -57,8 +44,7 @@ jobs:
             --build-arg gormConf=${GORM_CONF} \
             --build-arg pprofEnable=${PPROF_ENABLE}  \
             -t 175716812235.dkr.ecr.us-east-2.amazonaws.com/backend-microservices/user-service-stage:latest \
-            -f service/user_service/Dockerfile \
-            service/user_service/
+            -f service/user_service/Dockerfile  .
 
 
    
