@@ -1,2 +1,3 @@
-service/user_service/.env
-.env
+.env_production
+.env_stage
+.env_local
