@@ -15,7 +15,7 @@ services:
       sh -c " go mod tidy && go test -v ./integration_test/... "
 
   user_service:
-    env_file: .env_docker_example
+    env_file: .env_local
     environment:
       - LOG_LEVEL=${LOG_LEVEL}
       - DATABASE_URL=${DATABASE_URL}
@@ -53,7 +53,7 @@ services:
       - db
 
   department_service:
-    env_file: .env_docker_example
+    env_file: .env_local
     environment:
       - LOG_LEVEL=${LOG_LEVEL}
       - DATABASE_URL=${DATABASE_URL}

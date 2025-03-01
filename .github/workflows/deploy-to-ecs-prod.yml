@@ -35,7 +35,7 @@ jobs:
     
       - name: Load Environment Variables
         run: |
-          cat .env_docker_example >> $GITHUB_ENV
+          cat .env_production >> $GITHUB_ENV
           
       - name: Login to Amazon ECR
         id: login-ecr
