@@ -1,4 +1,4 @@
-name: Deploy services to Stage AWS ECR
+name: Deploy services to Stage AWS ECR and ECS
 
 on:
   push:
@@ -13,6 +13,17 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.23
+
+      - name: Install dependencies
+        run: go mod tidy
+
+      - name: Run Integration Tests
+        run: go test -v ./integration_test/...
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v3
@@ -29,12 +40,12 @@ jobs:
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
-              
-      - name: Build Docker Image
+        
+      - name: Build Docker Image for user-service
         run: |
           docker build \
             --build-arg logLevelEnvVar=${LOG_LEVEL} \
-            --build-arg databaseURLEnvVar=${DATABASE_URL}  \
+            --build-arg databaseURLEnvVar=${DATABASE_URL} \
             --build-arg portEnvVar=${PORT} \
             --build-arg dBEnvVar=${DB} \
             --build-arg dBMaxIdleEnvVar=${DB_MAX_IDLE} \
@@ -44,15 +55,20 @@ jobs:
             --build-arg zapConf=${ZAP_CONF} \
             --build-arg gormConf=${GORM_CONF} \
             --build-arg pprofEnable=${PPROF_ENABLE}  \
-            -t ${{secrets.AWS_ECR_URI}}/user-service-stage:latest \
-            -f service/user_service/Dockerfile  .
-          docker push ${{secrets.AWS_ECR_URI}}/user-service-stage:latest
+            -t ${{secrets.AWS_ECR_URI}}user-service-stage:latest \
+            -f service/user_service/Dockerfile  \
+            .
+          docker push ${{secrets.AWS_ECR_URI}}user-service-stage:latest
 
-      - name: Build Docker Image
+      - name: Deploy user-service to AWS ECS
+        run: |
+          aws ecs update-service --cluster cluster-backend-microservice --service service-user --force-new-deployment
+
+      - name: Build Docker Image for department-service
         run: |
           docker build \
             --build-arg logLevelEnvVar=${LOG_LEVEL} \
-            --build-arg databaseURLEnvVar=${DATABASE_URL}  \
+            --build-arg databaseURLEnvVar=${DATABASE_URL} \
             --build-arg portEnvVar=${PORT} \
             --build-arg dBEnvVar=${DB} \
             --build-arg dBMaxIdleEnvVar=${DB_MAX_IDLE} \
@@ -62,8 +78,13 @@ jobs:
             --build-arg zapConf=${ZAP_CONF} \
             --build-arg gormConf=${GORM_CONF} \
             --build-arg pprofEnable=${PPROF_ENABLE}  \
-            -t ${{secrets.AWS_ECR_URI}}/department-service-stage:latest \
-            -f service/department_service/Dockerfile  .
-          docker push ${{secrets.AWS_ECR_URI}}/department-service-stage:latest
+            -t ${{secrets.AWS_ECR_URI}}department-service-stage:latest \
+            -f service/department_service/Dockerfile  \
+            .
+          docker push ${{secrets.AWS_ECR_URI}}department-service-stage:latest
+
+      - name: Deploy department-service to AWS ECS
+        run: |
+          aws ecs update-service --cluster cluster-backend-microservice --service service-department --force-new-deployment
 
    
