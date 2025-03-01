@@ -1,4 +1,4 @@
-package usertest
+package integration_test
 
 import (
 	"context"
@@ -106,8 +106,8 @@ func setupTestDB(t *testing.T) container.Container {
 		container.DBMaxOpenEnvVar:     "100",
 		container.DBMaxLifeTimeEnvVar: "1",
 		container.DBMaxIdleTimeEnvVar: "10",
-		container.ZapConf:             "../../config/zap-logger-config.json",
-		container.GormConf:            "../../config/gorm-logger-config.json",
+		container.ZapConf:             "../config/zap-logger-config.json",
+		container.GormConf:            "../config/gorm-logger-config.json",
 		container.PprofEnable:         "false",
 	})
 	if err != nil {
@@ -124,7 +124,7 @@ func setupTestDB(t *testing.T) container.Container {
 
 func runMigrations(db *sql.DB) error {
 	// Read and execute your schema.sql
-	schema, err := os.ReadFile("../../database/migration.sql")
+	schema, err := os.ReadFile("../database/migration.sql")
 	if err != nil {
 		return err
 	}

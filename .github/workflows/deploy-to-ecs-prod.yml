@@ -1,4 +1,4 @@
-name: Deploy services to Stage AWS ECR
+name: Deploy services to production AWS ECR and ECS
 
 on:
   push:
@@ -13,6 +13,17 @@ jobs:
     steps:
       - name: Checkout code
         uses: actions/checkout@v2
+
+      - name: Set up Go
+        uses: actions/setup-go@v4
+        with:
+          go-version: 1.23
+
+      - name: Install dependencies
+        run: go mod tidy
+
+      - name: Run Integration Tests
+        run: go test -v ./integration_test/...
 
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v3
@@ -34,7 +45,7 @@ jobs:
         run: |
           docker build \
             --build-arg logLevelEnvVar=${LOG_LEVEL} \
-            --build-arg databaseURLEnvVar=${DATABASE_URL}  \
+            --build-arg databaseURLEnvVar=${{secrets.AWS_DB_URL}}  \
             --build-arg portEnvVar=${PORT} \
             --build-arg dBEnvVar=${DB} \
             --build-arg dBMaxIdleEnvVar=${DB_MAX_IDLE} \
@@ -48,11 +59,15 @@ jobs:
             -f service/user_service/Dockerfile  .
           docker push ${{secrets.AWS_ECR_URI}}/user-service-production:latest
 
+      - name: Deploy user-service to AWS ECS
+        run: |
+          aws ecs update-service --cluster cluster-backend-microservice --service service-user --force-new-deployment
+
       - name: Build Docker Image
         run: |
           docker build \
             --build-arg logLevelEnvVar=${LOG_LEVEL} \
-            --build-arg databaseURLEnvVar=${DATABASE_URL}  \
+            --build-arg databaseURLEnvVar=${{secrets.AWS_DB_URL}}  \
             --build-arg portEnvVar=${PORT} \
             --build-arg dBEnvVar=${DB} \
             --build-arg dBMaxIdleEnvVar=${DB_MAX_IDLE} \
@@ -65,5 +80,9 @@ jobs:
             -t ${{secrets.AWS_ECR_URI}}/department-service-production:latest \
             -f service/department_service/Dockerfile  .
           docker push ${{secrets.AWS_ECR_URI}}/department-service-production:latest
+
+      - name: Deploy department-service to AWS ECS
+        run: |
+          aws ecs update-service --cluster cluster-backend-microservice --service service-department --force-new-deployment
 
    
