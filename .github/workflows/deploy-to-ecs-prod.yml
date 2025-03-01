@@ -1,4 +1,4 @@
-name: Deploy services to production AWS ECR and ECS
+name: Deploy services to Production AWS ECR and ECS
 
 on:
   push:
@@ -40,12 +40,12 @@ jobs:
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
-              
-      - name: Build Docker Image
+        
+      - name: Build Docker Image for user-service
         run: |
           docker build \
             --build-arg logLevelEnvVar=${LOG_LEVEL} \
-            --build-arg databaseURLEnvVar=${{secrets.AWS_DB_URL}}  \
+            --build-arg databaseURLEnvVar=${DATABASE_URL} \
             --build-arg portEnvVar=${PORT} \
             --build-arg dBEnvVar=${DB} \
             --build-arg dBMaxIdleEnvVar=${DB_MAX_IDLE} \
@@ -55,19 +55,20 @@ jobs:
             --build-arg zapConf=${ZAP_CONF} \
             --build-arg gormConf=${GORM_CONF} \
             --build-arg pprofEnable=${PPROF_ENABLE}  \
-            -t ${{secrets.AWS_ECR_URI}}/user-service-production:latest \
-            -f service/user_service/Dockerfile  .
-          docker push ${{secrets.AWS_ECR_URI}}/user-service-production:latest
+            -t ${{secrets.AWS_ECR_URI}}user-service-production:latest \
+            -f service/user_service/Dockerfile  \
+            .
+          docker push ${{secrets.AWS_ECR_URI}}user-service-production:latest
 
       - name: Deploy user-service to AWS ECS
         run: |
           aws ecs update-service --cluster cluster-backend-microservice --service service-user --force-new-deployment
 
-      - name: Build Docker Image
+      - name: Build Docker Image for department-service
         run: |
           docker build \
             --build-arg logLevelEnvVar=${LOG_LEVEL} \
-            --build-arg databaseURLEnvVar=${{secrets.AWS_DB_URL}}  \
+            --build-arg databaseURLEnvVar=${DATABASE_URL} \
             --build-arg portEnvVar=${PORT} \
             --build-arg dBEnvVar=${DB} \
             --build-arg dBMaxIdleEnvVar=${DB_MAX_IDLE} \
@@ -77,9 +78,10 @@ jobs:
             --build-arg zapConf=${ZAP_CONF} \
             --build-arg gormConf=${GORM_CONF} \
             --build-arg pprofEnable=${PPROF_ENABLE}  \
-            -t ${{secrets.AWS_ECR_URI}}/department-service-production:latest \
-            -f service/department_service/Dockerfile  .
-          docker push ${{secrets.AWS_ECR_URI}}/department-service-production:latest
+            -t ${{secrets.AWS_ECR_URI}}department-service-production:latest \
+            -f service/department_service/Dockerfile  \
+            .
+          docker push ${{secrets.AWS_ECR_URI}}department-service-production:latest
 
       - name: Deploy department-service to AWS ECS
         run: |
