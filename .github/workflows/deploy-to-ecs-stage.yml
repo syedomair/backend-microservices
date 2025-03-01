@@ -41,7 +41,7 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
               
-      - name: Build Docker Image
+      - name: Build Docker Image for user-service
         run: |
           docker build \
             --build-arg logLevelEnvVar=${LOG_LEVEL} \
@@ -56,14 +56,15 @@ jobs:
             --build-arg gormConf=${GORM_CONF} \
             --build-arg pprofEnable=${PPROF_ENABLE}  \
             -t ${{secrets.AWS_ECR_URI}}/user-service-stage:latest \
-            -f service/user_service/Dockerfile  .
+            -f service/user_service/Dockerfile  \
+            .
           docker push ${{secrets.AWS_ECR_URI}}/user-service-stage:latest
 
       - name: Deploy user-service to AWS ECS
         run: |
           aws ecs update-service --cluster cluster-backend-microservice --service service-user --force-new-deployment
 
-      - name: Build Docker Image
+      - name: Build Docker Image for department-service
         run: |
           docker build \
             --build-arg logLevelEnvVar=${LOG_LEVEL} \
@@ -78,7 +79,8 @@ jobs:
             --build-arg gormConf=${GORM_CONF} \
             --build-arg pprofEnable=${PPROF_ENABLE}  \
             -t ${{secrets.AWS_ECR_URI}}/department-service-stage:latest \
-            -f service/department_service/Dockerfile  .
+            -f service/department_service/Dockerfile  \
+            .
           docker push ${{secrets.AWS_ECR_URI}}/department-service-stage:latest
 
       - name: Deploy department-service to AWS ECS
