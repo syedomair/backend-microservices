@@ -4,7 +4,6 @@ go 1.23.3
 
 require (
 	github.com/go-chi/chi v1.5.5
-	github.com/golang/mock v1.6.0
 	github.com/google/uuid v1.6.0
 	github.com/lib/pq v1.10.9
 	github.com/mitchellh/mapstructure v1.5.0

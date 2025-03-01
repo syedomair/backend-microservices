@@ -1,6 +1,19 @@
 version: "3.8"
 
 services:
+
+  test-runner:
+    image: golang:1.23
+    privileged: true # Enable privileged mode
+    environment:
+      - DOCKER_HOST=tcp://dind:2375 # Use the dind service
+    working_dir: /app
+    volumes:
+      - .:/app
+      - /var/run/docker.sock:/var/run/docker.sock # Allow access to host Docker
+    command: >
+      sh -c " go mod tidy && go test -v ./integration_test/... "
+
   user_service:
     env_file: .env_docker_example
     environment:
@@ -32,7 +45,7 @@ services:
         - gormConf=${GORM_CONF}
         - pprofEnable=${PPROF_ENABLE}
     ports:
-      - "8080:8185" 
+      - "8080:8185"
     volumes:
       - /config/gorm-logger-config.json:/config/gorm-logger-config.json
       - /config/zap-logger-config.json:/config/zap-logger-config.json
@@ -70,7 +83,7 @@ services:
         - gormConf=${GORM_CONF}
         - pprofEnable=${PPROF_ENABLE}
     ports:
-      - "8081:8185" 
+      - "8081:8185"
     volumes:
       - /config/gorm-logger-config.json:/config/gorm-logger-config.json
       - /config/zap-logger-config.json:/config/zap-logger-config.json
@@ -86,7 +99,7 @@ services:
       POSTGRES_PASSWORD: mypassword
       POSTGRES_DB: mydb
     volumes:
-      - ./database/migration.sql:/docker-entrypoint-initdb.d/migration.sql 
-      - db_data:/var/lib/postgresql/data 
+      - ./database/migration.sql:/docker-entrypoint-initdb.d/migration.sql
+      - db_data:/var/lib/postgresql/data
 volumes:
   db_data:
