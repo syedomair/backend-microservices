@@ -47,7 +47,7 @@ jobs:
 
       - name: Echo env var secret
         run: |
-          echo ${{secrets.AWS_DB_URL}}
+          echo ${{secrets.AWS_ECR_URI}}department-service-stage:latest
               
       - name: Build Docker Image for user-service
         run: |
@@ -63,7 +63,7 @@ jobs:
             --build-arg zapConf=${ZAP_CONF} \
             --build-arg gormConf=${GORM_CONF} \
             --build-arg pprofEnable=${PPROF_ENABLE}  \
-            -t ${{secrets.AWS_ECR_URI}}/user-service-stage:latest \
+            -t ${{secrets.AWS_ECR_URI}}user-service-stage:latest \
             -f service/user_service/Dockerfile  \
             .
           docker push ${{secrets.AWS_ECR_URI}}/user-service-stage:latest
@@ -86,7 +86,7 @@ jobs:
             --build-arg zapConf=${ZAP_CONF} \
             --build-arg gormConf=${GORM_CONF} \
             --build-arg pprofEnable=${PPROF_ENABLE}  \
-            -t ${{secrets.AWS_ECR_URI}}/department-service-stage:latest \
+            -t ${{secrets.AWS_ECR_URI}}department-service-stage:latest \
             -f service/department_service/Dockerfile  \
             .
           docker push ${{secrets.AWS_ECR_URI}}/department-service-stage:latest
