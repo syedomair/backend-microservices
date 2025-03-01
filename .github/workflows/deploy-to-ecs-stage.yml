@@ -40,6 +40,14 @@ jobs:
       - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v2
+        
+      - name: Echo env var
+        run: |
+          echo $GITHUB_ENV
+
+      - name: Echo env var secret
+        run: |
+          echo ${{secrets.AWS_DB_URL}}
               
       - name: Build Docker Image for user-service
         run: |
