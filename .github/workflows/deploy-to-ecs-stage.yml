@@ -68,7 +68,7 @@ jobs:
         run: |
           docker build \
             --build-arg logLevelEnvVar=${LOG_LEVEL} \
-            --build-arg databaseURLEnvVar=${DATABASE_URL} \
+            --build-arg databaseURLEnvVar=${{secrets.AWS_DB_URL}} \
             --build-arg portEnvVar=${PORT} \
             --build-arg dBEnvVar=${DB} \
             --build-arg dBMaxIdleEnvVar=${DB_MAX_IDLE} \
