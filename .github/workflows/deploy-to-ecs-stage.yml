@@ -1,90 +1,91 @@
-name: Deploy services to Stage AWS ECR and ECS
-
-on:
-  push:
-    branches:
-      - stage
-jobs:
-  deploy:
-    runs-on: ubuntu-latest
-    permissions:
-      id-token: write
-      contents: read
-    steps:
-      - name: Checkout code
-        uses: actions/checkout@v2
-
-      - name: Set up Go
-        uses: actions/setup-go@v4
-        with:
-          go-version: 1.23
-
-      - name: Install dependencies
-        run: go mod tidy
-
-      - name: Run Integration Tests
-        run: go test -v ./integration_test/...
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v3
-        with:
-          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
-          role-session-name: GitHubActionsSession
-          aws-region: ${{ secrets.AWS_REGION}}
-          audience: https://github.com
-    
-      - name: Load Environment Variables
-        run: |
-          cat .env_stage.example >> $GITHUB_ENV
-          
-      - name: Login to Amazon ECR
-        id: login-ecr
-        uses: aws-actions/amazon-ecr-login@v2
-        
-      - name: Build Docker Image for user-service
-        run: |
-          docker build \
-            --build-arg logLevelEnvVar=${LOG_LEVEL} \
-            --build-arg databaseURLEnvVar=${{secrets.AWS_DB_URL}} \
-            --build-arg portEnvVar=${PORT} \
-            --build-arg dBEnvVar=${DB} \
-            --build-arg dBMaxIdleEnvVar=${DB_MAX_IDLE} \
-            --build-arg dBMaxOpenEnvVar=${DB_MAX_OPEN} \
-            --build-arg dBMaxLifeTimeEnvVar=${DB_MAX_LIFE_TIME} \
-            --build-arg dBMaxIdleTimeEnvVar=${DB_MAX_IDLE_TIME} \
-            --build-arg zapConf=${ZAP_CONF} \
-            --build-arg gormConf=${GORM_CONF} \
-            --build-arg pprofEnable=${PPROF_ENABLE}  \
-            -t ${{secrets.AWS_ECR_URI}}user-service-stage:latest \
-            -f service/user_service/Dockerfile  \
-            .
-          docker push ${{secrets.AWS_ECR_URI}}user-service-stage:latest
-
-      - name: Deploy user-service to AWS ECS
-        run: |
-          aws ecs update-service --cluster cluster-backend-microservice --service service-user --force-new-deployment
-
-      - name: Build Docker Image for department-service
-        run: |
-          docker build \
-            --build-arg logLevelEnvVar=${LOG_LEVEL} \
-            --build-arg databaseURLEnvVar=${{secrets.AWS_DB_URL}} \
-            --build-arg portEnvVar=${PORT} \
-            --build-arg dBEnvVar=${DB} \
-            --build-arg dBMaxIdleEnvVar=${DB_MAX_IDLE} \
-            --build-arg dBMaxOpenEnvVar=${DB_MAX_OPEN} \
-            --build-arg dBMaxLifeTimeEnvVar=${DB_MAX_LIFE_TIME} \
-            --build-arg dBMaxIdleTimeEnvVar=${DB_MAX_IDLE_TIME} \
-            --build-arg zapConf=${ZAP_CONF} \
-            --build-arg gormConf=${GORM_CONF} \
-            --build-arg pprofEnable=${PPROF_ENABLE}  \
-            -t ${{secrets.AWS_ECR_URI}}department-service-stage:latest \
-            -f service/department_service/Dockerfile  \
-            .
-          docker push ${{secrets.AWS_ECR_URI}}department-service-stage:latest
-
-      - name: Deploy department-service to AWS ECS
-        run: |
-          aws ecs update-service --cluster cluster-backend-microservice --service service-department --force-new-deployment
-
-   
+#name: Deploy services to Stage AWS ECR and ECS
+#
+#on:
+#  push:
+#    branches:
+#      - stage
+#jobs:
+#  deploy:
+#    runs-on: ubuntu-latest
+#    permissions:
+#      id-token: write
+#      contents: read
+#    steps:
+#      - name: Checkout code
+#        uses: actions/checkout@v2
+#
+#      - name: Set up Go
+#        uses: actions/setup-go@v4
+#        with:
+#          go-version: 1.23
+#
+#      - name: Install dependencies
+#        run: go mod tidy
+#
+#      - name: Run Integration Tests
+#        run: go test -v ./integration_test/...
+#
+#      - name: Configure AWS credentials
+#        uses: aws-actions/configure-aws-credentials@v3
+#        with:
+#          role-to-assume: ${{ secrets.AWS_ROLE_ARN }}
+#          role-session-name: GitHubActionsSession
+#          aws-region: ${{ secrets.AWS_REGION}}
+#          audience: https://github.com
+#    
+#      - name: Load Environment Variables
+#        run: |
+#          cat .env_stage.example >> $GITHUB_ENV
+#          
+#      - name: Login to Amazon ECR
+#        id: login-ecr
+#        uses: aws-actions/amazon-ecr-login@v2
+#        
+#      - name: Build Docker Image for user-service
+#        run: |
+#          docker build \
+#            --build-arg logLevelEnvVar=${LOG_LEVEL} \
+#            --build-arg databaseURLEnvVar=${{secrets.AWS_DB_URL}} \
+#            --build-arg portEnvVar=${PORT} \
+#            --build-arg dBEnvVar=${DB} \
+#            --build-arg dBMaxIdleEnvVar=${DB_MAX_IDLE} \
+#            --build-arg dBMaxOpenEnvVar=${DB_MAX_OPEN} \
+#            --build-arg dBMaxLifeTimeEnvVar=${DB_MAX_LIFE_TIME} \
+#            --build-arg dBMaxIdleTimeEnvVar=${DB_MAX_IDLE_TIME} \
+#            --build-arg zapConf=${ZAP_CONF} \
+#            --build-arg gormConf=${GORM_CONF} \
+#            --build-arg pprofEnable=${PPROF_ENABLE}  \
+#            -t ${{secrets.AWS_ECR_URI}}user-service-stage:latest \
+#            -f service/user_service/Dockerfile  \
+#            .
+#          docker push ${{secrets.AWS_ECR_URI}}user-service-stage:latest
+#
+#      - name: Deploy user-service to AWS ECS
+#        run: |
+#          aws ecs update-service --cluster cluster-backend-microservice --service service-user --force-new-deployment
+#
+#      - name: Build Docker Image for department-service
+#        run: |
+#          docker build \
+#            --build-arg logLevelEnvVar=${LOG_LEVEL} \
+#            --build-arg databaseURLEnvVar=${{secrets.AWS_DB_URL}} \
+#            --build-arg portEnvVar=${PORT} \
+#            --build-arg dBEnvVar=${DB} \
+#            --build-arg dBMaxIdleEnvVar=${DB_MAX_IDLE} \
+#            --build-arg dBMaxOpenEnvVar=${DB_MAX_OPEN} \
+#            --build-arg dBMaxLifeTimeEnvVar=${DB_MAX_LIFE_TIME} \
+#            --build-arg dBMaxIdleTimeEnvVar=${DB_MAX_IDLE_TIME} \
+#            --build-arg zapConf=${ZAP_CONF} \
+#            --build-arg gormConf=${GORM_CONF} \
+#            --build-arg pprofEnable=${PPROF_ENABLE}  \
+#            -t ${{secrets.AWS_ECR_URI}}department-service-stage:latest \
+#            -f service/department_service/Dockerfile  \
+#            .
+#          docker push ${{secrets.AWS_ECR_URI}}department-service-stage:latest
+#
+#      - name: Deploy department-service to AWS ECS
+#        run: |
+#          aws ecs update-service --cluster cluster-backend-microservice --service service-department --force-new-deployment
+#
+#   
+#
