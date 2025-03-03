@@ -6,6 +6,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"sync"
 	"time"
 
 	"gorm.io/driver/mysql"
@@ -50,6 +51,8 @@ type PostgresAdapter struct {
 	dbMaxLifeTime int
 	dbMaxIdleTime int
 	gormConf      string
+	db            *gorm.DB
+	mu            sync.Mutex
 }
 
 var _ Db = (*PostgresAdapter)(nil)
@@ -65,7 +68,20 @@ func NewPostgresAdapter(url string, dbMaxIdle, dbMaxOpen, dbMaxLifeTime, dbMaxId
 }
 
 func (p *PostgresAdapter) MakeConnection() (*gorm.DB, error) {
-	return makeConnection(postgres.Open(p.dbUrl), p.dbUrl, p.dbMaxIdle, p.dbMaxOpen, p.dbMaxLifeTime, p.dbMaxIdleTime, p.gormConf)
+	p.mu.Lock()
+	defer p.mu.Unlock()
+
+	if p.db != nil {
+		return p.db, nil
+	}
+
+	db, err := makeConnection(postgres.Open(p.dbUrl), p.dbUrl, p.dbMaxIdle, p.dbMaxOpen, p.dbMaxLifeTime, p.dbMaxIdleTime, p.gormConf)
+	if err != nil {
+		return nil, err
+	}
+
+	p.db = db
+	return db, nil
 }
 
 type MySQLAdapter struct {
@@ -75,6 +91,8 @@ type MySQLAdapter struct {
 	dbMaxLifeTime int
 	dbMaxIdleTime int
 	gormConf      string
+	db            *gorm.DB
+	mu            sync.Mutex
 }
 
 var _ Db = (*MySQLAdapter)(nil)
@@ -90,7 +108,20 @@ func NewMySQLAdapter(url string, dbMaxIdle, dbMaxOpen, dbMaxLifeTime, dbMaxIdleT
 }
 
 func (m *MySQLAdapter) MakeConnection() (*gorm.DB, error) {
-	return makeConnection(mysql.Open(m.dbUrl), m.dbUrl, m.dbMaxIdle, m.dbMaxOpen, m.dbMaxLifeTime, m.dbMaxIdleTime, m.gormConf)
+	m.mu.Lock()
+	defer m.mu.Unlock()
+
+	if m.db != nil {
+		return m.db, nil
+	}
+
+	db, err := makeConnection(mysql.Open(m.dbUrl), m.dbUrl, m.dbMaxIdle, m.dbMaxOpen, m.dbMaxLifeTime, m.dbMaxIdleTime, m.gormConf)
+	if err != nil {
+		return nil, err
+	}
+
+	m.db = db
+	return db, nil
 }
 
 func makeConnection(dialector gorm.Dialector, url string, dbMaxIdle, dbMaxOpen, dbMaxLifeTime, dbMaxIdleTime int, gormConf string) (*gorm.DB, error) {
