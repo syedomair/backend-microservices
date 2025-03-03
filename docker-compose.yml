@@ -2,6 +2,16 @@ version: "3.8"
 
 services:
 
+  reverse-proxy:
+    image: nginx:latest
+    ports:
+      - "8180:80"  # Expose the reverse proxy on port 80
+    volumes:
+      - ./nginx.conf:/etc/nginx/nginx.conf  # Mount your custom NGINX configuration
+    depends_on:
+      - user_service
+      - department_service
+
   test-runner:
     image: golang:1.23
     privileged: true # Enable privileged mode
@@ -45,7 +55,7 @@ services:
         - gormConf=${GORM_CONF}
         - pprofEnable=${PPROF_ENABLE}
     ports:
-      - "8080:8185"
+      - "5001:8185"
     volumes:
       - /config/gorm-logger-config.json:/config/gorm-logger-config.json
       - /config/zap-logger-config.json:/config/zap-logger-config.json
@@ -83,7 +93,7 @@ services:
         - gormConf=${GORM_CONF}
         - pprofEnable=${PPROF_ENABLE}
     ports:
-      - "8081:8185"
+      - "5002:8185"
     volumes:
       - /config/gorm-logger-config.json:/config/gorm-logger-config.json
       - /config/zap-logger-config.json:/config/zap-logger-config.json
@@ -101,5 +111,6 @@ services:
     volumes:
       - ./database/migration.sql:/docker-entrypoint-initdb.d/migration.sql
       - db_data:/var/lib/postgresql/data
+
 volumes:
   db_data:
