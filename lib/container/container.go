@@ -11,22 +11,19 @@ import (
 )
 
 const (
-	LogLevelEnvVar      = "LOG_LEVEL"
-	DatabaseURLEnvVar   = "DATABASE_URL"
-	PortEnvVar          = "PORT"
-	DBEnvVar            = "DB"
-	DBMaxIdleEnvVar     = "DB_MAX_IDLE"
-	DBMaxOpenEnvVar     = "DB_MAX_OPEN"
-	DBMaxLifeTimeEnvVar = "DB_MAX_LIFE_TIME"
-	DBMaxIdleTimeEnvVar = "DB_MAX_IDLE_TIME"
-	ZapConf             = "ZAP_CONF"
-	GormConf            = "GORM_CONF"
-	PprofEnable         = "PPROF_ENABLE"
-)
-
-const (
-	Postgres = "POSTGRES"
-	Mysql    = "MYSQL"
+	LogLevel      = "LOG_LEVEL"
+	DatabaseURL   = "DATABASE_URL"
+	Port          = "PORT"
+	DB            = "DB"
+	DBMaxIdle     = "DB_MAX_IDLE"
+	DBMaxOpen     = "DB_MAX_OPEN"
+	DBMaxLifeTime = "DB_MAX_LIFE_TIME"
+	DBMaxIdleTime = "DB_MAX_IDLE_TIME"
+	ZapConf       = "ZAP_CONF"
+	GormConf      = "GORM_CONF"
+	PprofEnable   = "PPROF_ENABLE"
+	Postgres      = "POSTGRES"
+	Mysql         = "MYSQL"
 )
 
 // Container interface it is used to as container
@@ -52,7 +49,7 @@ func (c *container) Db() *gorm.DB {
 }
 func (c *container) dbSetup() (*gorm.DB, error) {
 
-	strDBMaxIdleEnvVar, err := c.getRequiredEnvVar(DBMaxIdleEnvVar)
+	strDBMaxIdleEnvVar, err := c.getRequiredEnvVar(DBMaxIdle)
 	if err != nil {
 		return nil, err
 	}
@@ -61,7 +58,7 @@ func (c *container) dbSetup() (*gorm.DB, error) {
 		return nil, err
 	}
 
-	strDBMaxOpenEnvVar, err := c.getRequiredEnvVar(DBMaxOpenEnvVar)
+	strDBMaxOpenEnvVar, err := c.getRequiredEnvVar(DBMaxOpen)
 	if err != nil {
 		return nil, err
 	}
@@ -70,7 +67,7 @@ func (c *container) dbSetup() (*gorm.DB, error) {
 		return nil, err
 	}
 
-	strDBMaxLifeTimeEnvVar, err := c.getRequiredEnvVar(DBMaxLifeTimeEnvVar)
+	strDBMaxLifeTimeEnvVar, err := c.getRequiredEnvVar(DBMaxLifeTime)
 	if err != nil {
 		return nil, err
 	}
@@ -79,7 +76,7 @@ func (c *container) dbSetup() (*gorm.DB, error) {
 		return nil, err
 	}
 
-	strDBMaxIdleTimeEnvVar, err := c.getRequiredEnvVar(DBMaxIdleTimeEnvVar)
+	strDBMaxIdleTimeEnvVar, err := c.getRequiredEnvVar(DBMaxIdleTime)
 	if err != nil {
 		return nil, err
 	}
@@ -88,7 +85,7 @@ func (c *container) dbSetup() (*gorm.DB, error) {
 		return nil, err
 	}
 
-	strDatabaseURLEnvVar, err := c.getRequiredEnvVar(DatabaseURLEnvVar)
+	strDatabaseURLEnvVar, err := c.getRequiredEnvVar(DatabaseURL)
 	if err != nil {
 		return nil, err
 	}
@@ -98,7 +95,7 @@ func (c *container) dbSetup() (*gorm.DB, error) {
 		return nil, err
 	}
 
-	ca := NewDBConnectionAdapter(DBEnvVar,
+	ca := NewDBConnectionAdapter(DB,
 		strDatabaseURLEnvVar,
 		intDBMaxIdleEnvVar,
 		intDBMaxOpenEnvVar,
@@ -132,7 +129,7 @@ func (c *container) Logger() *zap.Logger {
 }
 
 func (c *container) portSetup() (string, error) {
-	return c.getRequiredEnvVar(PortEnvVar)
+	return c.getRequiredEnvVar(Port)
 }
 func (c *container) Port() string {
 	return c.port
