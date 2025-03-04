@@ -19,16 +19,16 @@ import (
 
 func main() {
 	c, err := container.New(map[string]string{
-		container.LogLevelEnvVar:      os.Getenv(container.LogLevelEnvVar),
-		container.DatabaseURLEnvVar:   os.Getenv(container.DatabaseURLEnvVar),
-		container.PortEnvVar:          os.Getenv(container.PortEnvVar),
-		container.DBMaxIdleEnvVar:     os.Getenv(container.DBMaxIdleEnvVar),
-		container.DBMaxOpenEnvVar:     os.Getenv(container.DBMaxOpenEnvVar),
-		container.DBMaxLifeTimeEnvVar: os.Getenv(container.DBMaxLifeTimeEnvVar),
-		container.DBMaxIdleTimeEnvVar: os.Getenv(container.DBMaxIdleTimeEnvVar),
-		container.ZapConf:             os.Getenv(container.ZapConf),
-		container.GormConf:            os.Getenv(container.GormConf),
-		container.PprofEnable:         os.Getenv(container.PprofEnable),
+		container.LogLevel:      os.Getenv(container.LogLevel),
+		container.DatabaseURL:   os.Getenv(container.DatabaseURL),
+		container.Port:          os.Getenv(container.Port),
+		container.DBMaxIdle:     os.Getenv(container.DBMaxIdle),
+		container.DBMaxOpen:     os.Getenv(container.DBMaxOpen),
+		container.DBMaxLifeTime: os.Getenv(container.DBMaxLifeTime),
+		container.DBMaxIdleTime: os.Getenv(container.DBMaxIdleTime),
+		container.ZapConf:       os.Getenv(container.ZapConf),
+		container.GormConf:      os.Getenv(container.GormConf),
+		container.PprofEnable:   os.Getenv(container.PprofEnable),
 	})
 	if err != nil {
 		defer func() {

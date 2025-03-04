@@ -99,16 +99,16 @@ func setupTestDB(t *testing.T) container.Container {
 	connecStr := fmt.Sprintf("postgres://%s:%s@%s:%s/%s", os.Getenv("DB_USER"), os.Getenv("DB_PASSWORD"), os.Getenv("DB_HOST"), os.Getenv("DB_PORT"), dbName)
 
 	c, err := container.New(map[string]string{
-		container.LogLevelEnvVar:      "DEBUG",
-		container.DatabaseURLEnvVar:   connecStr,
-		container.PortEnvVar:          "8186",
-		container.DBMaxIdleEnvVar:     "10",
-		container.DBMaxOpenEnvVar:     "100",
-		container.DBMaxLifeTimeEnvVar: "1",
-		container.DBMaxIdleTimeEnvVar: "10",
-		container.ZapConf:             "../config/zap-logger-config.json",
-		container.GormConf:            "../config/gorm-logger-config.json",
-		container.PprofEnable:         "false",
+		container.LogLevel:      "DEBUG",
+		container.DatabaseURL:   connecStr,
+		container.Port:          "8186",
+		container.DBMaxIdle:     "10",
+		container.DBMaxOpen:     "100",
+		container.DBMaxLifeTime: "1",
+		container.DBMaxIdleTime: "10",
+		container.ZapConf:       "../config/zap-logger-config.json",
+		container.GormConf:      "../config/gorm-logger-config.json",
+		container.PprofEnable:   "false",
 	})
 	if err != nil {
 		defer func() {
