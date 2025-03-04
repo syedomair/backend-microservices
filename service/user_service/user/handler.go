@@ -54,8 +54,6 @@ func (c *Controller) GetAllUsersData(limit, offset int, orderBy, sort string) (m
 	methodName := "GetAllUsersData"
 	c.Logger.Debug("method start", zap.String("method", methodName))
 	start := time.Now()
-	//ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-	//defer cancel()
 
 	g, _ := errgroup.WithContext(context.Background())
 
