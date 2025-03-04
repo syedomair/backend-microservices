@@ -27,7 +27,7 @@ func TestPostgresAdapter_MakeConnection(t *testing.T) {
 	}{
 		{
 			name:        "Successful connection",
-			dbUrl:       os.Getenv(DatabaseURLEnvVar),
+			dbUrl:       os.Getenv(DatabaseURL),
 			expectedErr: nil,
 		},
 		{
@@ -158,8 +158,8 @@ func TestMakeConnection(t *testing.T) {
 	}{
 		{
 			name:        "Successful connection",
-			dialector:   postgres.Open(os.Getenv(DatabaseURLEnvVar)),
-			dbUrl:       os.Getenv(DatabaseURLEnvVar),
+			dialector:   postgres.Open(os.Getenv(DatabaseURL)),
+			dbUrl:       os.Getenv(DatabaseURL),
 			expectedErr: nil,
 		},
 		{
