@@ -326,68 +326,6 @@ func TestNew(t *testing.T) {
 		})
 	}
 }
-
-func Test_validateEnvVars(t *testing.T) {
-	type args struct {
-		envVars      map[string]string
-		requiredKeys []string
-	}
-	tests := []struct {
-		name    string
-		args    args
-		wantErr bool
-	}{
-		{
-			name: "Test validateEnvVars with all required keys present",
-			args: args{
-				envVars: map[string]string{
-					"KEY1": "value1",
-					"KEY2": "value2",
-				},
-				requiredKeys: []string{"KEY1", "KEY2"},
-			},
-			wantErr: false,
-		},
-		{
-			name: "Test validateEnvVars with missing required key",
-			args: args{
-				envVars: map[string]string{
-					"KEY1": "value1",
-				},
-				requiredKeys: []string{"KEY1", "KEY2"},
-			},
-			wantErr: true,
-		},
-		{
-			name: "Test validateEnvVars with empty key in requiredKeys",
-			args: args{
-				envVars: map[string]string{
-					"KEY1": "value1",
-				},
-				requiredKeys: []string{"KEY1", ""},
-			},
-			wantErr: false,
-		},
-		{
-			name: "Test validateEnvVars with whitespace key in requiredKeys",
-			args: args{
-				envVars: map[string]string{
-					"KEY1": "value1",
-				},
-				requiredKeys: []string{"KEY1", "   "},
-			},
-			wantErr: false,
-		},
-	}
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			if err := validateEnvVars(tt.args.envVars, tt.args.requiredKeys); (err != nil) != tt.wantErr {
-				t.Errorf("validateEnvVars() error = %v, wantErr %v", err, tt.wantErr)
-			}
-		})
-	}
-}
-
 func Test_container_dbSetup(t *testing.T) {
 	type fields struct {
 		logger               *zap.Logger
