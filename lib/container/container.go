@@ -2,9 +2,7 @@ package container
 
 import (
 	"fmt"
-	"maps"
 	"strconv"
-	"strings"
 
 	"go.uber.org/zap"
 	"gorm.io/gorm"
@@ -26,7 +24,7 @@ const (
 	Mysql         = "MYSQL"
 )
 
-// Container interface it is used to as container
+// Container interface
 type Container interface {
 	Logger() *zap.Logger
 	Db() *gorm.DB
@@ -47,118 +45,26 @@ var _ Container = (*container)(nil)
 func (c *container) Db() *gorm.DB {
 	return c.db
 }
-func (c *container) dbSetup() (*gorm.DB, error) {
-
-	strDBMaxIdleEnvVar, err := c.getRequiredEnvVar(DBMaxIdle)
-	if err != nil {
-		return nil, err
-	}
-	intDBMaxIdleEnvVar, err := strconv.Atoi(strDBMaxIdleEnvVar)
-	if err != nil {
-		return nil, err
-	}
-
-	strDBMaxOpenEnvVar, err := c.getRequiredEnvVar(DBMaxOpen)
-	if err != nil {
-		return nil, err
-	}
-	intDBMaxOpenEnvVar, err := strconv.Atoi(strDBMaxOpenEnvVar)
-	if err != nil {
-		return nil, err
-	}
-
-	strDBMaxLifeTimeEnvVar, err := c.getRequiredEnvVar(DBMaxLifeTime)
-	if err != nil {
-		return nil, err
-	}
-	intDBMaxLifeTimeEnvVar, err := strconv.Atoi(strDBMaxLifeTimeEnvVar)
-	if err != nil {
-		return nil, err
-	}
-
-	strDBMaxIdleTimeEnvVar, err := c.getRequiredEnvVar(DBMaxIdleTime)
-	if err != nil {
-		return nil, err
-	}
-	intDBMaxIdleTimeEnvVar, err := strconv.Atoi(strDBMaxIdleTimeEnvVar)
-	if err != nil {
-		return nil, err
-	}
-
-	strDatabaseURLEnvVar, err := c.getRequiredEnvVar(DatabaseURL)
-	if err != nil {
-		return nil, err
-	}
-
-	strGormConf, err := c.getRequiredEnvVar(GormConf)
-	if err != nil {
-		return nil, err
-	}
-
-	ca := NewDBConnectionAdapter(DB,
-		strDatabaseURLEnvVar,
-		intDBMaxIdleEnvVar,
-		intDBMaxOpenEnvVar,
-		intDBMaxLifeTimeEnvVar,
-		intDBMaxIdleTimeEnvVar,
-		strGormConf)
-	if c.db == nil {
-		c.db, err = ca.MakeConnection()
-		if err != nil {
-			return nil, err
-		}
-	}
-	return c.db, nil
-}
-
-func (c *container) loggerSetup() (*zap.Logger, error) {
-	if c.logger == nil {
-		zapConfig, err := c.getRequiredEnvVar(ZapConf)
-		if err != nil {
-			return nil, err
-		}
-		c.logger, err = NewLogger(zapConfig)
-		if err != nil {
-			return nil, err
-		}
-	}
-	return c.logger, nil
-}
-func (c *container) Logger() *zap.Logger {
-	return c.logger
-}
-
-func (c *container) portSetup() (string, error) {
-	return c.getRequiredEnvVar(Port)
-}
-func (c *container) Port() string {
-	return c.port
-}
-
-func (c *container) pprofEnableSetup() (string, error) {
-	return c.getRequiredEnvVar(PprofEnable)
-}
-func (c *container) PprofEnable() string {
-	return c.pprofEnable
-}
-
-func (c *container) getRequiredEnvVar(key string) (string, error) {
-	value, ok := c.environmentVariables[key]
-	if !ok {
-		return "", fmt.Errorf("missing mandatory envvar: %q", key)
-	}
-	return value, nil
-}
 
 func New(envVars map[string]string) (Container, error) {
-	requiredKeys := maps.Keys(envVars)
-	requiredKeysSlice := make([]string, len(envVars))
-	for key := range requiredKeys {
-		requiredKeysSlice = append(requiredKeysSlice, key)
+	requiredKeys := []string{
+		DatabaseURL,
+		Port,
+		ZapConf,
+		GormConf,
+		PprofEnable,
+		DBMaxIdle,
+		DBMaxOpen,
+		DBMaxLifeTime,
+		DBMaxIdleTime,
 	}
-	if err := validateEnvVars(envVars, requiredKeysSlice); err != nil {
-		return &container{environmentVariables: envVars}, err
+
+	for _, key := range requiredKeys {
+		if _, ok := envVars[key]; !ok {
+			return nil, fmt.Errorf("missing mandatory envvar: %q", key)
+		}
 	}
+
 	c := &container{environmentVariables: envVars}
 
 	var err error
@@ -181,13 +87,109 @@ func New(envVars map[string]string) (Container, error) {
 	return c, nil
 }
 
-func validateEnvVars(envVars map[string]string, requiredKeys []string) error {
-	for _, key := range requiredKeys {
-		if strings.TrimSpace(key) != "" {
-			if _, exists := envVars[key]; !exists {
-				return fmt.Errorf("missing mandatory env var: %q", key)
-			}
-		}
+func (c *container) dbSetup() (*gorm.DB, error) {
+	if c.db != nil {
+		return c.db, nil
 	}
-	return nil
+
+	dbMaxIdle, err := c.getIntEnvVar(DBMaxIdle)
+	if err != nil {
+		return nil, err
+	}
+
+	dbMaxOpen, err := c.getIntEnvVar(DBMaxOpen)
+	if err != nil {
+		return nil, err
+	}
+
+	dbMaxLifeTime, err := c.getIntEnvVar(DBMaxLifeTime)
+	if err != nil {
+		return nil, err
+	}
+
+	dbMaxIdleTime, err := c.getIntEnvVar(DBMaxIdleTime)
+	if err != nil {
+		return nil, err
+	}
+
+	strDatabaseURLEnvVar, err := c.getRequiredEnvVar(DatabaseURL)
+	if err != nil {
+		return nil, err
+	}
+
+	strGormConf, err := c.getRequiredEnvVar(GormConf)
+	if err != nil {
+		return nil, err
+	}
+
+	ca := NewDBConnectionAdapter(DB,
+		strDatabaseURLEnvVar,
+		dbMaxIdle,
+		dbMaxOpen,
+		dbMaxLifeTime,
+		dbMaxIdleTime,
+		strGormConf)
+	db, err := ca.MakeConnection()
+	if err != nil {
+		return nil, err
+	}
+	c.db = db
+	return db, nil
+}
+
+func (c *container) loggerSetup() (*zap.Logger, error) {
+	if c.logger != nil {
+		return c.logger, nil
+	}
+
+	zapConfig, err := c.getRequiredEnvVar(ZapConf)
+	if err != nil {
+		return nil, err
+	}
+	logger, err := NewLogger(zapConfig)
+	if err != nil {
+		return nil, err
+	}
+	c.logger = logger
+	return logger, nil
+}
+
+func (c *container) Logger() *zap.Logger {
+	return c.logger
+}
+
+func (c *container) portSetup() (string, error) {
+	return c.getRequiredEnvVar(Port)
+}
+
+func (c *container) Port() string {
+	return c.port
+}
+
+func (c *container) pprofEnableSetup() (string, error) {
+	return c.getRequiredEnvVar(PprofEnable)
+}
+
+func (c *container) PprofEnable() string {
+	return c.pprofEnable
+}
+
+func (c *container) getIntEnvVar(key string) (int, error) {
+	strVal, err := c.getRequiredEnvVar(key)
+	if err != nil {
+		return 0, err
+	}
+	intVal, err := strconv.Atoi(strVal)
+	if err != nil {
+		return 0, fmt.Errorf("failed to convert %q to int: %w", strVal, err)
+	}
+	return intVal, nil
+}
+
+func (c *container) getRequiredEnvVar(key string) (string, error) {
+	value, ok := c.environmentVariables[key]
+	if !ok {
+		return "", fmt.Errorf("missing mandatory envvar: %q", key)
+	}
+	return value, nil
 }
