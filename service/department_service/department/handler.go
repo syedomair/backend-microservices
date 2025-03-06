@@ -17,7 +17,7 @@ type Controller struct {
 	Repo   Repository
 }
 
-// GetAllDepartments retrieves all users with additional statistics.
+// GetAllDepartments retrieves all departments with additional statistics.
 func (c *Controller) GetAllDepartments(w http.ResponseWriter, r *http.Request) {
 	methodName := "GetAllDepartments"
 	c.Logger.Debug("method start", zap.String("method", methodName))
@@ -45,7 +45,7 @@ func (c *Controller) handleError(methodName string, w http.ResponseWriter, err e
 	response.ErrorResponseHelper(methodName, w, err.Error(), statusCode)
 }
 
-// GetAllDepartmentData fetches user data and statistics concurrently.
+// GetAllDepartmentData fetches department data and statistics concurrently.
 func (c *Controller) GetAllDepartmentData(limit, offset int, orderBy, sort string) (map[string]interface{}, error) {
 	methodName := "GetAllDepartmentData"
 	c.Logger.Debug("method start", zap.String("method", methodName))
