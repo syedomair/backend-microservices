@@ -140,7 +140,7 @@ func randString(n int) string {
 func TestUserRepo(t *testing.T) {
 	c := setupTestDB(t)
 
-	userRepo := user.NewPostgresRepository(c.Db(), c.Logger())
+	userRepo := user.NewDBRepository(c.Db(), c.Logger())
 
 	limit := 10
 	offset := 0

@@ -1,149 +1,236 @@
 package user
 
 import (
+	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/syedomair/backend-microservices/models"
 )
 
-type mockRepository struct {
-	users      []*models.User
-	count      string
-	highAge    int
-	lowAge     int
-	highSalary float64
-	lowSalary  float64
-	avgAge     float64
-	avgSalary  float64
-}
-
-func (m *mockRepository) GetAllUserDB(limit int, offset int, orderby string, sort string) ([]*models.User, string, error) {
-	return m.users, m.count, nil
-}
-func (m *mockRepository) GetUserHighAge() (int, error) {
-	return m.highAge, nil
-}
-func (m *mockRepository) GetUserLowAge() (int, error) {
-	return m.lowAge, nil
-}
-func (m *mockRepository) GetUserAvgAge() (float64, error) {
-	return m.avgAge, nil
-}
-func (m *mockRepository) GetUserLowSalary() (float64, error) {
-	return m.lowSalary, nil
-}
-func (m *mockRepository) GetUserHighSalary() (float64, error) {
-	return m.highSalary, nil
-}
-func (m *mockRepository) GetUserAvgSalary() (float64, error) {
-	return m.avgSalary, nil
-}
-
-func TestGetAllUserDB_CustomMock(t *testing.T) {
-	// Create a custom mock repository
-	mockRepo := &mockRepository{
-		users: []*models.User{
-			{ID: "1", Name: "John Doe", Email: "john@example.com", DepartmentID: "dept1", Age: 30, Salary: 50000},
-			{ID: "2", Name: "Jane Doe", Email: "jane@example.com", DepartmentID: "dept2", Age: 25, Salary: 60000},
+func TestGetAllUserDB_Success(t *testing.T) {
+	// Arrange
+	mockRepo := &MockRepository{
+		GetAllUserDBFunc: func(limit, offset int, orderBy, sort string) ([]*models.User, string, error) {
+			return []*models.User{{ID: "1", Name: "John Doe", Age: 30, Salary: 50000.0}}, "1", nil
 		},
-		count: "2",
 	}
 
-	// Call the function to test
-	limit := 10
-	offset := 0
-	orderby := "name"
-	sort := "asc"
+	// Act
+	users, count, err := mockRepo.GetAllUserDB(10, 0, "name", "asc")
 
-	users, count, err := mockRepo.GetAllUserDB(limit, offset, orderby, sort)
-
-	// Assertions
+	// Assert
 	assert.NoError(t, err)
-	assert.Equal(t, 2, len(users))
-	assert.Equal(t, "2", count)
+	assert.Equal(t, 1, len(users))
+	assert.Equal(t, "1", count)
+	assert.Equal(t, "John Doe", users[0].Name)
 }
 
-func TestGetUserHighAge_CustomMock(t *testing.T) {
-	// Create a custom mock repository
-	mockRepo := &mockRepository{
-		highAge: 50,
+func TestGetAllUserDB_Error(t *testing.T) {
+	// Arrange
+	mockRepo := &MockRepository{
+		GetAllUserDBFunc: func(limit, offset int, orderBy, sort string) ([]*models.User, string, error) {
+			return nil, "", errors.New("database error")
+		},
 	}
 
-	// Call the function to test
+	// Act
+	users, count, err := mockRepo.GetAllUserDB(10, 0, "name", "asc")
+
+	// Assert
+	assert.Error(t, err)
+	assert.Nil(t, users)
+	assert.Equal(t, "", count)
+}
+
+func TestGetUserHighAge_Success(t *testing.T) {
+	// Arrange
+	mockRepo := &MockRepository{
+		GetUserHighAgeFunc: func() (int, error) {
+			return 40, nil
+		},
+	}
+
+	// Act
 	highAge, err := mockRepo.GetUserHighAge()
 
-	// Assertions
+	// Assert
 	assert.NoError(t, err)
-	assert.Equal(t, 50, highAge)
+	assert.Equal(t, 40, highAge)
 }
 
-func TestGetUserLowAge_CustomMock(t *testing.T) {
-	// Create a custom mock repository
-	mockRepo := &mockRepository{
-		lowAge: 20,
+func TestGetUserHighAge_Error(t *testing.T) {
+	// Arrange
+	mockRepo := &MockRepository{
+		GetUserHighAgeFunc: func() (int, error) {
+			return 0, errors.New("database error")
+		},
 	}
 
-	// Call the function to test
+	// Act
+	highAge, err := mockRepo.GetUserHighAge()
+
+	// Assert
+	assert.Error(t, err)
+	assert.Equal(t, 0, highAge)
+}
+
+func TestGetUserLowAge_Success(t *testing.T) {
+	// Arrange
+	mockRepo := &MockRepository{
+		GetUserLowAgeFunc: func() (int, error) {
+			return 20, nil
+		},
+	}
+
+	// Act
 	lowAge, err := mockRepo.GetUserLowAge()
 
-	// Assertions
+	// Assert
 	assert.NoError(t, err)
 	assert.Equal(t, 20, lowAge)
 }
 
-func TestGetUserAvgAge_CustomMock(t *testing.T) {
-	// Create a custom mock repository
-	mockRepo := &mockRepository{
-		avgAge: 35.5,
+func TestGetUserLowAge_Error(t *testing.T) {
+	// Arrange
+	mockRepo := &MockRepository{
+		GetUserLowAgeFunc: func() (int, error) {
+			return 0, errors.New("database error")
+		},
 	}
 
-	// Call the function to test
+	// Act
+	lowAge, err := mockRepo.GetUserLowAge()
+
+	// Assert
+	assert.Error(t, err)
+	assert.Equal(t, 0, lowAge)
+}
+
+func TestGetUserAvgAge_Success(t *testing.T) {
+	// Arrange
+	mockRepo := &MockRepository{
+		GetUserAvgAgeFunc: func() (float64, error) {
+			return 30.5, nil
+		},
+	}
+
+	// Act
 	avgAge, err := mockRepo.GetUserAvgAge()
 
-	// Assertions
+	// Assert
 	assert.NoError(t, err)
-	assert.Equal(t, 35.5, avgAge)
+	assert.Equal(t, 30.5, avgAge)
 }
 
-func TestGetUserLowSalary_CustomMock(t *testing.T) {
-	// Create a custom mock repository
-	mockRepo := &mockRepository{
-		lowSalary: 40000.0,
+func TestGetUserAvgAge_Error(t *testing.T) {
+	// Arrange
+	mockRepo := &MockRepository{
+		GetUserAvgAgeFunc: func() (float64, error) {
+			return 0, errors.New("database error")
+		},
 	}
 
-	// Call the function to test
+	// Act
+	avgAge, err := mockRepo.GetUserAvgAge()
+
+	// Assert
+	assert.Error(t, err)
+	assert.Equal(t, 0.0, avgAge)
+}
+
+func TestGetUserLowSalary_Success(t *testing.T) {
+	// Arrange
+	mockRepo := &MockRepository{
+		GetUserLowSalaryFunc: func() (float64, error) {
+			return 30000.0, nil
+		},
+	}
+
+	// Act
 	lowSalary, err := mockRepo.GetUserLowSalary()
 
-	// Assertions
+	// Assert
 	assert.NoError(t, err)
-	assert.Equal(t, 40000.0, lowSalary)
+	assert.Equal(t, 30000.0, lowSalary)
 }
 
-func TestGetUserHighSalary_CustomMock(t *testing.T) {
-	// Create a custom mock repository
-	mockRepo := &mockRepository{
-		highSalary: 100000.0,
+func TestGetUserLowSalary_Error(t *testing.T) {
+	// Arrange
+	mockRepo := &MockRepository{
+		GetUserLowSalaryFunc: func() (float64, error) {
+			return 0, errors.New("database error")
+		},
 	}
 
-	// Call the function to test
+	// Act
+	lowSalary, err := mockRepo.GetUserLowSalary()
+
+	// Assert
+	assert.Error(t, err)
+	assert.Equal(t, 0.0, lowSalary)
+}
+
+func TestGetUserHighSalary_Success(t *testing.T) {
+	// Arrange
+	mockRepo := &MockRepository{
+		GetUserHighSalaryFunc: func() (float64, error) {
+			return 100000.0, nil
+		},
+	}
+
+	// Act
 	highSalary, err := mockRepo.GetUserHighSalary()
 
-	// Assertions
+	// Assert
 	assert.NoError(t, err)
 	assert.Equal(t, 100000.0, highSalary)
 }
 
-func TestGetUserAvgSalary_CustomMock(t *testing.T) {
-	// Create a custom mock repository
-	mockRepo := &mockRepository{
-		avgSalary: 75000.0,
+func TestGetUserHighSalary_Error(t *testing.T) {
+	// Arrange
+	mockRepo := &MockRepository{
+		GetUserHighSalaryFunc: func() (float64, error) {
+			return 0, errors.New("database error")
+		},
 	}
 
-	// Call the function to test
+	// Act
+	highSalary, err := mockRepo.GetUserHighSalary()
+
+	// Assert
+	assert.Error(t, err)
+	assert.Equal(t, 0.0, highSalary)
+}
+
+func TestGetUserAvgSalary_Success(t *testing.T) {
+	// Arrange
+	mockRepo := &MockRepository{
+		GetUserAvgSalaryFunc: func() (float64, error) {
+			return 65000.0, nil
+		},
+	}
+
+	// Act
 	avgSalary, err := mockRepo.GetUserAvgSalary()
 
-	// Assertions
+	// Assert
 	assert.NoError(t, err)
-	assert.Equal(t, 75000.0, avgSalary)
+	assert.Equal(t, 65000.0, avgSalary)
+}
+
+func TestGetUserAvgSalary_Error(t *testing.T) {
+	// Arrange
+	mockRepo := &MockRepository{
+		GetUserAvgSalaryFunc: func() (float64, error) {
+			return 0, errors.New("database error")
+		},
+	}
+
+	// Act
+	avgSalary, err := mockRepo.GetUserAvgSalary()
+
+	// Assert
+	assert.Error(t, err)
+	assert.Equal(t, 0.0, avgSalary)
 }

@@ -10,7 +10,7 @@ func EndPointConf(c container.Container) []router.EndPoint {
 
 	userController := user.Controller{
 		Logger: c.Logger(),
-		Repo:   user.NewPostgresRepository(c.Db(), c.Logger()),
+		Repo:   user.NewDBRepository(c.Db(), c.Logger()),
 	}
 
 	return []router.EndPoint{
