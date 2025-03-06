@@ -15,6 +15,17 @@ func (User) TableName() string {
 	return "public.user"
 }
 
+type UserStatistics struct {
+	UserList       []*User
+	Count          string
+	UserHighAge    int
+	UserLowAge     int
+	UserAvgAge     float64
+	UserLowSalary  float64
+	UserHighSalary float64
+	UserAvgSalary  float64
+}
+
 type ResponseUser struct {
 	HighAge    string      `json:"high_age" `
 	LowAge     string      `json:"low_age" `

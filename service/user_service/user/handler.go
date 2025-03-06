@@ -1,7 +1,6 @@
 package user
 
 import (
-	"context"
 	"fmt"
 	"net/http"
 	"strconv"
@@ -11,7 +10,6 @@ import (
 	"github.com/syedomair/backend-microservices/lib/request"
 	"github.com/syedomair/backend-microservices/lib/response"
 	"github.com/syedomair/backend-microservices/models"
-	"golang.org/x/sync/errgroup"
 
 	"go.uber.org/zap"
 )
@@ -33,7 +31,25 @@ func (c *Controller) GetAllUsers(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	responseObj, err := c.GetAllUsersData(limit, offset, orderBy, sort)
+	userStatistics, err := c.GetUserStatistics(limit, offset, orderBy, sort)
+	if err != nil {
+		c.handleError(methodName, w, err, http.StatusBadRequest)
+		return
+	}
+
+	responseUserObj := models.ResponseUser{
+		HighAge:    strconv.Itoa(userStatistics.UserHighAge),
+		LowAge:     strconv.Itoa(userStatistics.UserLowAge),
+		AvgAge:     fmt.Sprintf("%.2f", userStatistics.UserAvgAge),
+		HighSalary: fmt.Sprintf("%.2f", userStatistics.UserHighSalary),
+		LowSalary:  fmt.Sprintf("%.2f", userStatistics.UserLowSalary),
+		AvgSalary:  fmt.Sprintf("%.2f", userStatistics.UserAvgSalary),
+		Count:      userStatistics.Count,
+		List:       userStatistics.UserList,
+	}
+
+	var responseObj map[string]interface{}
+	err = mapstructure.Decode(responseUserObj, &responseObj)
 	if err != nil {
 		c.handleError(methodName, w, err, http.StatusBadRequest)
 		return
@@ -42,116 +58,23 @@ func (c *Controller) GetAllUsers(w http.ResponseWriter, r *http.Request) {
 	c.Logger.Debug("method end", zap.String("method", methodName), zap.Duration("duration", time.Since(start)))
 	response.SuccessResponseHelper(w, responseObj, http.StatusOK)
 }
-
-// handleError abstracts error handling logic.
-func (c *Controller) handleError(methodName string, w http.ResponseWriter, err error, statusCode int) {
-	c.Logger.Error("method failed", zap.String("method", methodName), zap.Error(err))
-	response.ErrorResponseHelper(methodName, c.Logger, w, err.Error(), statusCode)
-}
-
-// GetAllUsersData fetches user data and statistics concurrently.
-func (c *Controller) GetAllUsersData(limit, offset int, orderBy, sort string) (map[string]interface{}, error) {
-	methodName := "GetAllUsersData"
+func (c *Controller) GetUserStatistics(limit, offset int, orderBy, sort string) (*models.UserStatistics, error) {
+	methodName := "GetAllUsers"
 	c.Logger.Debug("method start", zap.String("method", methodName))
 	start := time.Now()
 
-	g, _ := errgroup.WithContext(context.Background())
+	userService := NewUserService(c.Repo, c.Logger)
 
-	var (
-		userList          []*models.User
-		count             string
-		intUserHighAge    int
-		intUserLowAge     int
-		fltUserAvgAge     float64
-		fltUserAvgSalary  float64
-		fltUserLowSalary  float64
-		fltUserHighSalary float64
-	)
-
-	g.Go(func() error {
-		var err error
-		userList, count, err = c.Repo.GetAllUserDB(limit, offset, orderBy, sort)
-		if err != nil {
-			return err
-		}
-		return nil
-	})
-
-	g.Go(func() error {
-		var err error
-		intUserHighAge, err = c.Repo.GetUserHighAge()
-		if err != nil {
-			return err
-		}
-		return nil
-	})
-
-	g.Go(func() error {
-		var err error
-		intUserLowAge, err = c.Repo.GetUserLowAge()
-		if err != nil {
-			return err
-		}
-		return nil
-	})
-
-	g.Go(func() error {
-		var err error
-		fltUserAvgAge, err = c.Repo.GetUserAvgAge()
-		if err != nil {
-			return err
-		}
-		return nil
-	})
-
-	g.Go(func() error {
-		var err error
-		fltUserLowSalary, err = c.Repo.GetUserLowSalary()
-		if err != nil {
-			return err
-		}
-		return nil
-	})
-
-	g.Go(func() error {
-		var err error
-		fltUserHighSalary, err = c.Repo.GetUserHighSalary()
-		if err != nil {
-			return err
-		}
-		return nil
-	})
-
-	g.Go(func() error {
-		var err error
-		fltUserAvgSalary, err = c.Repo.GetUserAvgSalary()
-		if err != nil {
-			return err
-		}
-		return nil
-	})
-
-	if err := g.Wait(); err != nil {
-		return nil, err
-	}
-	responseUserObj := models.ResponseUser{
-		HighAge:    strconv.Itoa(intUserHighAge),
-		LowAge:     strconv.Itoa(intUserLowAge),
-		AvgAge:     fmt.Sprintf("%.2f", fltUserAvgAge),
-		HighSalary: fmt.Sprintf("%.2f", fltUserHighSalary),
-		LowSalary:  fmt.Sprintf("%.2f", fltUserLowSalary),
-		AvgSalary:  fmt.Sprintf("%.2f", fltUserAvgSalary),
-		Count:      count,
-		List:       userList,
-	}
-
-	var responseObj map[string]interface{}
-	err := mapstructure.Decode(responseUserObj, &responseObj)
+	userStatistics, err := userService.GetAllUserStatistics(limit, offset, orderBy, sort)
 	if err != nil {
 		return nil, err
 	}
 
 	c.Logger.Debug("method end", zap.String("method", methodName), zap.Duration("duration", time.Since(start)))
-	return responseObj, nil
+	return userStatistics, nil
+}
 
+func (c *Controller) handleError(methodName string, w http.ResponseWriter, err error, statusCode int) {
+	c.Logger.Error("method failed", zap.String("method", methodName), zap.Error(err))
+	response.ErrorResponseHelper(methodName, w, err.Error(), statusCode)
 }

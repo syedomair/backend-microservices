@@ -42,7 +42,7 @@ func (c *Controller) GetAllDepartments(w http.ResponseWriter, r *http.Request) {
 // handleError abstracts error handling logic.
 func (c *Controller) handleError(methodName string, w http.ResponseWriter, err error, statusCode int) {
 	c.Logger.Error("method failed", zap.String("method", methodName), zap.Error(err))
-	response.ErrorResponseHelper(methodName, c.Logger, w, err.Error(), statusCode)
+	response.ErrorResponseHelper(methodName, w, err.Error(), statusCode)
 }
 
 // GetAllDepartmentData fetches user data and statistics concurrently.

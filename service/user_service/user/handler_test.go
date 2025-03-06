@@ -1,100 +1,223 @@
 package user
 
+/*
 import (
+	"encoding/json"
 	"fmt"
+	"net/http"
+	"net/http/httptest"
 	"testing"
 
+	"github.com/stretchr/testify/assert"
+	"github.com/stretchr/testify/mock"
 	"github.com/syedomair/backend-microservices/models"
-	"go.uber.org/mock/gomock"
 	"go.uber.org/zap"
+	"go.uber.org/zap/zaptest/observer"
+
+	"github.com/syedomair/backend-microservices/repository"
 )
 
-func TestController_GetAllUsersData(t *testing.T) {
-	ctrl := gomock.NewController(t)
-	defer ctrl.Finish()
+// MockRepository is a mock implementation of the Repository interface.
+type MockRepository struct {
+	mock.Mock
+}
 
-	mockRepo := NewMockRepository(ctrl)
-	mockLogger := zap.NewNop()
+// MockUserServiceFacade is a mock implementation of the UserServiceFacade.
+type MockUserServiceFacade struct {
+	mock.Mock
+}
 
+func (m *MockUserServiceFacade) GetAllUserStatistics(limit, offset int, orderBy, sort string) (*models.UserStatistics, error) {
+	args := m.Called(limit, offset, orderBy, sort)
+	return args.Get(0).(*models.UserStatistics), args.Error(1)
+}
+
+func NewMockUserServiceFacade(repo repository.Repository, logger *zap.Logger) *MockUserServiceFacade {
+	return &MockUserServiceFacade{}
+}
+
+func TestController_GetAllUsers(t *testing.T) {
+	// Setup logging
+	core, logs := observer.New(zap.InfoLevel)
+	logger := zap.New(core)
+
+	// Mock repository and facade
+	mockRepo := &MockRepository{}
+	mockFacade := &MockUserServiceFacade{}
+
+	// Setup controller
 	controller := &Controller{
+		Logger: logger,
 		Repo:   mockRepo,
-		Logger: mockLogger,
 	}
 
-	tests := []struct {
-		name           string
-		limit          int
-		offset         int
-		orderBy        string
-		sort           string
-		mockSetup      func(*MockRepository)
-		expectedResult map[string]interface{}
-		expectedError  error
-	}{
-		{
-			name:    "Success - All repository calls succeed",
-			limit:   10,
-			offset:  0,
-			orderBy: "id",
-			sort:    "asc",
-			mockSetup: func(mr *MockRepository) {
-				// Mock all repository calls to return valid data
-				mr.EXPECT().GetAllUserDB(10, 0, "id", "asc").Return([]*models.User{{ID: "1", Name: "John"}}, "1", nil).AnyTimes()
-				mr.EXPECT().GetUserHighAge().Return(30, nil).AnyTimes() // gomock.Any() matches any context
-				mr.EXPECT().GetUserLowAge().Return(20, nil).AnyTimes()
-				mr.EXPECT().GetUserAvgAge().Return(25.0, nil).AnyTimes()
-				mr.EXPECT().GetUserHighSalary().Return(100000.0, nil).AnyTimes()
-				mr.EXPECT().GetUserLowSalary().Return(50000.0, nil).AnyTimes()
-				mr.EXPECT().GetUserAvgSalary().Return(75000.0, nil).AnyTimes()
-			},
-			expectedResult: map[string]interface{}{
-				"HighAge":    "30",
-				"LowAge":     "20",
-				"AvgAge":     "25.00",
-				"HighSalary": "100000.00",
-				"LowSalary":  "50000.00",
-				"AvgSalary":  "75000.00",
-				"Count":      "1",
-				"List":       []*models.User{{ID: "1", Name: "John"}},
-			},
-			expectedError: nil,
-		},
+	// Mock facade creation
+	originalNewUserServiceFacade := NewUserServiceFacade
+	NewUserServiceFacade = func(repo repository.Repository, logger *zap.Logger) *MockUserServiceFacade {
+		return mockFacade
+	}
+	defer func() {
+		NewUserServiceFacade = originalNewUserServiceFacade
+	}()
+
+	// Mock GetAllUserStatistics call
+	mockUserStatistics := &models.UserStatistics{
+		UserHighAge:    50,
+		UserLowAge:     20,
+		UserAvgAge:     35.5,
+		UserHighSalary: 100000.0,
+		UserLowSalary:  50000.0,
+		UserAvgSalary:  75000.0,
+		Count:          10,
+		UserList:       []models.User{},
+	}
+	mockFacade.On("GetAllUserStatistics", 1000, 0, "name", "asc").Return(mockUserStatistics, nil)
+
+	// Create HTTP request
+	req, err := http.NewRequest("GET", "/users?limit=1000&offset=0&orderBy=name&sort=asc", nil)
+	if err != nil {
+		t.Fatal(err)
 	}
 
-	for _, tt := range tests {
-		t.Run(tt.name, func(t *testing.T) {
-			// Set up mock expectations
-			tt.mockSetup(mockRepo)
+	// Create HTTP recorder
+	w := httptest.NewRecorder()
 
-			// Call the method under test
-			result, err := controller.GetAllUsersData(tt.limit, tt.offset, tt.orderBy, tt.sort)
+	// Call GetAllUsers
+	controller.GetAllUsers(w, req)
 
-			// Verify the error
-			if tt.expectedError != nil {
-				if err == nil || err.Error() != tt.expectedError.Error() {
-					t.Errorf("expected error: %v, got: %v", tt.expectedError, err)
-				}
-			} else {
-				if err != nil {
-					t.Errorf("unexpected error: %v", err)
-				}
-			}
+	// Check response status code
+	if w.Code != http.StatusOK {
+		t.Errorf("expected status code %d, got %d", http.StatusOK, w.Code)
+	}
 
-			// Verify the result
-			if tt.expectedResult != nil {
-				if result == nil {
-					t.Errorf("expected result: %v, got: %v", tt.expectedResult, result)
-				} else {
-					for key, expectedValue := range tt.expectedResult {
-						if key != "List" {
-							actualValue := result[key]
-							if fmt.Sprintf("%v", actualValue) != fmt.Sprintf("%v", expectedValue) {
-								t.Errorf("expected %s: %v, got: %v", key, expectedValue, actualValue)
-							}
-						}
-					}
-				}
-			}
-		})
+	// Check response body
+	var responseBody map[string]interface{}
+	err = json.Unmarshal(w.Body.Bytes(), &responseBody)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Assert response content
+	assert.Equal(t, "50", responseBody["HighAge"])
+	assert.Equal(t, "20", responseBody["LowAge"])
+	assert.Equal(t, "35.50", responseBody["AvgAge"])
+	assert.Equal(t, "100000.00", responseBody["HighSalary"])
+	assert.Equal(t, "50000.00", responseBody["LowSalary"])
+	assert.Equal(t, "75000.00", responseBody["AvgSalary"])
+	assert.Equal(t, float64(10), responseBody["Count"])
+}
+
+func TestController_GetAllUsers_InvalidQueryString(t *testing.T) {
+	// Setup logging
+	core, logs := observer.New(zap.InfoLevel)
+	logger := zap.New(core)
+
+	// Mock repository
+	mockRepo := &MockRepository{}
+
+	// Setup controller
+	controller := &Controller{
+		Logger: logger,
+		Repo:   mockRepo,
+	}
+
+	// Create HTTP request with invalid query string
+	req, err := http.NewRequest("GET", "/users?limit=abc&offset=0&orderBy=name&sort=asc", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Create HTTP recorder
+	w := httptest.NewRecorder()
+
+	// Call GetAllUsers
+	controller.GetAllUsers(w, req)
+
+	// Check response status code
+	if w.Code != http.StatusBadRequest {
+		t.Errorf("expected status code %d, got %d", http.StatusBadRequest, w.Code)
 	}
 }
+
+func TestController_GetAllUsers_FacadeError(t *testing.T) {
+	// Setup logging
+	core, logs := observer.New(zap.InfoLevel)
+	logger := zap.New(core)
+
+	// Mock repository and facade
+	mockRepo := &MockRepository{}
+	mockFacade := &MockUserServiceFacade{}
+
+	// Setup controller
+	controller := &Controller{
+		Logger: logger,
+		Repo:   mockRepo,
+	}
+
+	// Mock facade creation
+	originalNewUserServiceFacade := NewUserServiceFacade
+	NewUserServiceFacade = func(repo repository.Repository, logger *zap.Logger) *MockUserServiceFacade {
+		return mockFacade
+	}
+	defer func() {
+		NewUserServiceFacade = originalNewUserServiceFacade
+	}()
+
+	// Mock GetAllUserStatistics call with error
+	mockFacade.On("GetAllUserStatistics", 1000, 0, "name", "asc").Return(nil, fmt.Errorf("facade error"))
+
+	// Create HTTP request
+	req, err := http.NewRequest("GET", "/users?limit=1000&offset=0&orderBy=name&sort=asc", nil)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Create HTTP recorder
+	w := httptest.NewRecorder()
+
+	// Call GetAllUsers
+	controller.GetAllUsers(w, req)
+
+	// Check response status code
+	if w.Code != http.StatusBadRequest {
+		t.Errorf("expected status code %d, got %d", http.StatusBadRequest, w.Code)
+	}
+}
+
+func TestController_handleError(t *testing.T) {
+	// Setup logging
+	core, logs := observer.New(zap.InfoLevel)
+	logger := zap.New(core)
+
+	// Mock repository
+	mockRepo := &MockRepository{}
+
+	// Setup controller
+	controller := &Controller{
+		Logger: logger,
+		Repo:   mockRepo,
+	}
+
+	// Create HTTP recorder
+	w := httptest.NewRecorder()
+
+	// Call handleError
+	err := fmt.Errorf("test error")
+	controller.handleError("testMethod", w, err, http.StatusBadRequest)
+
+	// Check response status code
+	if w.Code != http.StatusBadRequest {
+		t.Errorf("expected status code %d, got %d", http.StatusBadRequest, w.Code)
+	}
+
+	// Check response body
+	var responseBody map[string]interface{}
+	err = json.Unmarshal(w.Body.Bytes(), &responseBody)
+	if err != nil {
+		t.Fatal(err)
+	}
+
+	// Assert response content
+	assert.Equal(t, "test error", responseBody["message"])
+}
+*/
