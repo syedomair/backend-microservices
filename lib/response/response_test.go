@@ -7,17 +7,15 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"go.uber.org/zap"
 )
 
 func TestErrorResponseHelper(t *testing.T) {
-	logger, _ := zap.NewDevelopment()
 	recorder := httptest.NewRecorder()
 	methodName := "TestMethod"
 	errorMessage := "Test Error Message"
 	httpStatus := http.StatusBadRequest
 
-	ErrorResponseHelper(methodName, logger, recorder, errorMessage, httpStatus)
+	ErrorResponseHelper(methodName, recorder, errorMessage, httpStatus)
 
 	assert.Equal(t, httpStatus, recorder.Code)
 	assert.Equal(t, "application/json;charset=utf-8", recorder.Header().Get("Content-Type"))

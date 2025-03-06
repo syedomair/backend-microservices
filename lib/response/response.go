@@ -3,8 +3,6 @@ package response
 import (
 	"encoding/json"
 	"net/http"
-
-	"go.uber.org/zap"
 )
 
 const (
@@ -13,12 +11,10 @@ const (
 )
 
 // ErrorResponseHelper func
-func ErrorResponseHelper(methodName string, logger *zap.Logger,
-	w http.ResponseWriter, errorMessage string, httpStatus int) {
+func ErrorResponseHelper(methodName string, w http.ResponseWriter, errorMessage string, httpStatus int) {
 	w.Header().Set("Content-Type", "application/json;charset=utf-8")
 	w.WriteHeader(httpStatus)
 	w.Write(errorResponse(errorMessage))
-	logger.Debug("error response", zap.String("method", methodName), zap.String("error_message", errorMessage))
 }
 
 // SuccessResponseHelper func
