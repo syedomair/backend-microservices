@@ -10,18 +10,18 @@ import (
 	"gorm.io/gorm"
 )
 
-type postgresRepo struct {
+type dbRepo struct {
 	client *gorm.DB
 	logger *zap.Logger
 }
 
-// NewPostgresRepository Public.
-func NewPostgresRepository(c *gorm.DB, logger *zap.Logger) Repository {
-	return &postgresRepo{client: c, logger: logger}
+// NewDBRepository Public.
+func NewDBRepository(c *gorm.DB, logger *zap.Logger) Repository {
+	return &dbRepo{client: c, logger: logger}
 }
 
 // GetAllDepartmentDB Public
-func (p *postgresRepo) GetAllDepartmentDB(limit int, offset int, orderby string, sort string) ([]*models.Department, string, error) {
+func (p *dbRepo) GetAllDepartmentDB(limit int, offset int, orderby string, sort string) ([]*models.Department, string, error) {
 	methodName := "GetAllDepartmentDB"
 	p.logger.Debug("method start", zap.String("method_name", methodName))
 	start := time.Now()

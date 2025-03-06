@@ -10,7 +10,7 @@ func EndPointConf(c container.Container) []router.EndPoint {
 
 	departmentController := department.Controller{
 		Logger: c.Logger(),
-		Repo:   department.NewPostgresRepository(c.Db(), c.Logger()),
+		Repo:   department.NewDBRepository(c.Db(), c.Logger()),
 	}
 
 	return []router.EndPoint{

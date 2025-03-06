@@ -10,18 +10,18 @@ import (
 	"gorm.io/gorm"
 )
 
-type postgresRepo struct {
+type dbRepo struct {
 	client *gorm.DB
 	logger *zap.Logger
 }
 
-// NewPostgresRepository Public.
-func NewPostgresRepository(c *gorm.DB, logger *zap.Logger) Repository {
-	return &postgresRepo{client: c, logger: logger}
+// NewDBRepository Public.
+func NewDBRepository(c *gorm.DB, logger *zap.Logger) Repository {
+	return &dbRepo{client: c, logger: logger}
 }
 
 // GetAllUserDB Public
-func (p *postgresRepo) GetAllUserDB(limit int, offset int, orderby string, sort string) ([]*models.User, string, error) {
+func (p *dbRepo) GetAllUserDB(limit int, offset int, orderby string, sort string) ([]*models.User, string, error) {
 	methodName := "GetAllUserDB"
 	p.logger.Debug("method start", zap.String("method_name", methodName))
 	start := time.Now()
@@ -42,7 +42,7 @@ func (p *postgresRepo) GetAllUserDB(limit int, offset int, orderby string, sort 
 }
 
 // GetUserHighAge Public
-func (p *postgresRepo) GetUserHighAge() (int, error) {
+func (p *dbRepo) GetUserHighAge() (int, error) {
 	methodName := "GetUserHighAge"
 	p.logger.Debug("method start", zap.String("method_name", methodName))
 	start := time.Now()
@@ -59,7 +59,7 @@ func (p *postgresRepo) GetUserHighAge() (int, error) {
 }
 
 // GetUserLowAge Public
-func (p *postgresRepo) GetUserLowAge() (int, error) {
+func (p *dbRepo) GetUserLowAge() (int, error) {
 	methodName := "GetUserLowAge"
 	p.logger.Debug("method start", zap.String("method_name", methodName))
 	start := time.Now()
@@ -76,7 +76,7 @@ func (p *postgresRepo) GetUserLowAge() (int, error) {
 }
 
 // GetUserAvgAge Public
-func (p *postgresRepo) GetUserAvgAge() (float64, error) {
+func (p *dbRepo) GetUserAvgAge() (float64, error) {
 	methodName := "GetUserAvgAge"
 	p.logger.Debug("method start", zap.String("method_name", methodName))
 	start := time.Now()
@@ -93,7 +93,7 @@ func (p *postgresRepo) GetUserAvgAge() (float64, error) {
 }
 
 // GetUserLowSalary Public
-func (p *postgresRepo) GetUserLowSalary() (float64, error) {
+func (p *dbRepo) GetUserLowSalary() (float64, error) {
 	methodName := "GetUserLowSalary"
 	p.logger.Debug("method start", zap.String("method_name", methodName))
 	start := time.Now()
@@ -110,7 +110,7 @@ func (p *postgresRepo) GetUserLowSalary() (float64, error) {
 }
 
 // GetUserHighSalary Public
-func (p *postgresRepo) GetUserHighSalary() (float64, error) {
+func (p *dbRepo) GetUserHighSalary() (float64, error) {
 	methodName := "GetUserHighSalary"
 	p.logger.Debug("method start", zap.String("method_name", methodName))
 	start := time.Now()
@@ -127,7 +127,7 @@ func (p *postgresRepo) GetUserHighSalary() (float64, error) {
 }
 
 // GetUserAvgSalary Public
-func (p *postgresRepo) GetUserAvgSalary() (float64, error) {
+func (p *dbRepo) GetUserAvgSalary() (float64, error) {
 	methodName := "GetUserAvgSalary"
 	p.logger.Debug("method start", zap.String("method_name", methodName))
 	start := time.Now()
