@@ -25,13 +25,13 @@ func (c *Controller) GetAllUsers(w http.ResponseWriter, r *http.Request) {
 	c.Logger.Debug("method start", zap.String("method", methodName))
 	start := time.Now()
 
-	limit, offset, orderBy, sort, err := request.ValidateQueryString(r, "1000", "0", "name", "asc")
+	queryParam, err := request.ValidateQueryString(r, "1000", "0", "name", "asc")
 	if err != nil {
 		c.handleError(methodName, w, err, http.StatusBadRequest)
 		return
 	}
 
-	userStatistics, err := c.GetUserStatistics(limit, offset, orderBy, sort)
+	userStatistics, err := c.GetUserStatistics(queryParam.Limit, queryParam.Page, queryParam.OrderBy, queryParam.Sort)
 	if err != nil {
 		c.handleError(methodName, w, err, http.StatusBadRequest)
 		return
