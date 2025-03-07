@@ -5,9 +5,9 @@ services:
   reverse-proxy:
     image: nginx:latest
     ports:
-      - "8180:80"  # Expose the reverse proxy on port 80
+      - "8180:80" # Expose the reverse proxy on port 80
     volumes:
-      - ./nginx.conf:/etc/nginx/nginx.conf  # Mount your custom NGINX configuration
+      - ./nginx.conf:/etc/nginx/nginx.conf # Mount your custom NGINX configuration
     depends_on:
       - user_service
       - department_service

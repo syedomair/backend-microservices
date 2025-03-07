@@ -19,7 +19,7 @@
         "stacktraceEncoder": "full"
     },
     "initialFields": {
-        "service": "user-service",
-        "environment": "production"
+        "service": "service",
+        "environment": "sandbox"
     }
 }

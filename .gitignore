@@ -1,3 +1,5 @@
 .env_production
 .env_stage
 .env_local
+service/user_service/.env
+service/user_service/Makefile
