@@ -2,91 +2,109 @@ package request
 
 import (
 	"errors"
+	"fmt"
 	"net/http"
 	"strconv"
 )
 
-// ValidateQueryString Public
-func ValidateQueryString(r *http.Request, defaultLimit string, defaultPage string, defaultOrderby string, defaultSort string) (int, int, string, string, error) {
+// QueryParams represents query parameters for pagination and sorting.
+type QueryParams struct {
+	Limit   int
+	Page    int
+	OrderBy string
+	Sort    string
+}
 
-	strLimit := "0"
-	page := ""
-	orderby := ""
-	sort := ""
+// ValidateQueryString validates query string parameters and returns QueryParams.
+func ValidateQueryString(r *http.Request, defaultLimit string, defaultPage string, defaultOrderby string, defaultSort string) (QueryParams, error) {
+	params := QueryParams{}
 
+	// Extract query parameters
+	limit, err := getLimit(r, defaultLimit)
+	if err != nil {
+		return params, err
+	}
+	page, err := getPage(r, defaultPage)
+	if err != nil {
+		return params, err
+	}
+	orderby, err := getOrderBy(r, defaultOrderby)
+	if err != nil {
+		return params, err
+	}
+	sort, err := getSort(r, defaultSort)
+	if err != nil {
+		return params, err
+	}
+
+	// Adjust page offset
+	if page != 0 {
+		page = (limit * page) - limit
+	}
+	fmt.Println("limit", limit)
+	fmt.Println("page", page)
+	fmt.Println("orderBy", orderby)
+	fmt.Println("sort", sort)
+	return QueryParams{
+		Limit:   limit,
+		Page:    page,
+		OrderBy: orderby,
+		Sort:    sort,
+	}, nil
+}
+
+// getLimit retrieves and validates the 'limit' query parameter.
+func getLimit(r *http.Request, defaultLimit string) (int, error) {
 	limits, ok := r.URL.Query()["limit"]
 	if !ok || len(limits[0]) < 1 {
-		strLimit = "0"
-	} else {
-
-		strLimit = limits[0]
+		return parseInt(defaultLimit)
 	}
+	return parseInt(limits[0])
+}
 
+// getPage retrieves and validates the 'page' query parameter.
+func getPage(r *http.Request, defaultPage string) (int, error) {
 	pages, ok := r.URL.Query()["page"]
 	if !ok || len(pages[0]) < 1 {
-		page = ""
-	} else {
-		page = pages[0]
+		return parseInt(defaultPage)
 	}
+	return parseInt(pages[0])
+}
+
+// getOrderBy retrieves and validates the 'orderby' query parameter.
+func getOrderBy(r *http.Request, defaultOrderby string) (string, error) {
 	orderbys, ok := r.URL.Query()["orderby"]
 	if !ok || len(orderbys[0]) < 1 {
-		orderby = ""
-	} else {
-		orderby = orderbys[0]
+		return defaultOrderby, nil
 	}
+	orderby := orderbys[0]
+	if _, err := strconv.Atoi(orderby); err == nil {
+		return "", errors.New("invalid 'orderby' value in query string. Must be a string. ")
+	}
+	return orderby, nil
+}
+
+// getSort retrieves and validates the 'sort' query parameter.
+func getSort(r *http.Request, defaultSort string) (string, error) {
 	sorts, ok := r.URL.Query()["sort"]
 	if !ok || len(sorts[0]) < 1 {
-		sort = ""
-	} else {
-		sort = sorts[0]
+		return defaultSort, nil
 	}
+	sort := sorts[0]
+	if _, err := strconv.Atoi(sort); err == nil {
+		return "", errors.New("invalid 'sort' value in query string. Must be a string. ")
+	}
+	if (sort != "asc") && (sort != "desc") {
+		return "", errors.New("invalid 'sort' value in query string. Must be either 'asc' or 'desc'. ")
+	}
+	return sort, nil
+}
 
-	if strLimit != "0" {
-		if _, err := strconv.Atoi(strLimit); err != nil {
-			return 0, 0, "", "", errors.New("invalid 'limit' number in query string. Must be a number. ")
-		}
-	} else {
-		strLimit = defaultLimit
-	}
-	if page != "" {
-		if _, err := strconv.Atoi(page); err != nil {
-			return 0, 0, "", "", errors.New("invalid 'page' number in query string. Must be a number. ")
-		}
-	} else {
-		page = defaultPage
-	}
-
-	intLimit, err := strconv.Atoi(strLimit)
+// parseInt converts a string to an integer.
+func parseInt(str string) (int, error) {
+	i, err := strconv.Atoi(str)
 	if err != nil {
-		return 0, 0, "", "", errors.New("invalid 'limit' number in query string. Must be a number. ")
+		return 0, errors.New("invalid number in query string. Must be a number. ")
 	}
-	intPage, err := strconv.Atoi(page)
-	if err != nil {
-		return 0, 0, "", "", errors.New("invalid 'page' number in query string. Must be a number. ")
-	}
-
-	if intPage != 0 {
-		intPage = (intLimit * intPage) - intLimit
-	}
-
-	if orderby != "" {
-		if _, err := strconv.Atoi(orderby); err == nil {
-			return 0, 0, "", "", errors.New("invalid 'orderby' value in query string. Must be a string. ")
-		}
-	} else {
-		orderby = defaultOrderby
-	}
-
-	if sort != "" {
-		if _, err := strconv.Atoi(sort); err == nil {
-			return 0, 0, "", "", errors.New("invalid 'sort' value in query string. Must be a string. ")
-		}
-		if (sort != "asc") && (sort != "desc") {
-			return 0, 0, "", "", errors.New("invalid 'sort' value in query string. Must be either 'asc' or 'desc'. ")
-		}
-	} else {
-		sort = defaultSort
-	}
-
-	return intLimit, intPage, orderby, sort, nil
+	return i, nil
 }
