@@ -15,5 +15,8 @@ clean_docker:
 	docker rmi bmc-department_service
 
 
-run_test: 
+test: 
 	go test -v ./...
+
+test_race:
+	go test ./... -race
