@@ -2,7 +2,6 @@ package request
 
 import (
 	"errors"
-	"fmt"
 	"net/http"
 	"strconv"
 )
@@ -41,10 +40,6 @@ func ValidateQueryString(r *http.Request, defaultLimit string, defaultPage strin
 	if page != 0 {
 		page = (limit * page) - limit
 	}
-	fmt.Println("limit", limit)
-	fmt.Println("page", page)
-	fmt.Println("orderBy", orderby)
-	fmt.Println("sort", sort)
 	return QueryParams{
 		Limit:   limit,
 		Page:    page,
