@@ -16,6 +16,12 @@ CREATE TABLE IF NOT EXISTS public.user (
     salary DOUBLE PRECISION CHECK (salary >= 0)  -- Ensures salary is non-negative
 );
 
+CREATE TABLE IF NOT EXISTS points (
+    id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),  -- Generate a new UUID by default
+    user_id UUID REFERENCES public.user(id) ON DELETE SET NULL,  -- Foreign key constraint
+    points INT 
+);
+
 INSERT INTO department 
     (name, address) 
 	VALUES
@@ -34,3 +40,16 @@ VALUES
 ('George Costanza', 'george.costanza@example.com', (SELECT id FROM department WHERE name = 'IT Support'), 40, 90000),
 ('Hannah Baker', 'hannah.baker@example.com', (SELECT id FROM department WHERE name = 'IT Support'), 22, 48000),
 ('Ian Malcolm', 'ian.malcolm@example.com', (SELECT id FROM department WHERE name = 'IT Support'), 38, 85000);
+
+
+INSERT INTO points (user_id, points)
+VALUES
+((select id from public.user where email = 'alice.johnson@example.com'), 23),
+((select id from public.user where email = 'bob.smith@example.com'), 43),
+((select id from public.user where email = 'charlie.brown@example.com'), 28),
+((select id from public.user where email = 'diana.prince@example.com'), 83),
+((select id from public.user where email = 'ethan.hunt@example.com'), 13),
+((select id from public.user where email = 'fiona.gallagher@example.com'), 33),
+((select id from public.user where email = 'george.costanza@example.com'), 93),
+((select id from public.user where email = 'hannah.baker@example.com'), 13),
+((select id from public.user where email = 'ian.malcolm@example.com'), 73);

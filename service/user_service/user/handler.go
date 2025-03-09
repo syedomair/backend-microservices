@@ -58,8 +58,10 @@ func (c *Controller) GetAllUsers(w http.ResponseWriter, r *http.Request) {
 	c.Logger.Debug("method end", zap.String("method", methodName), zap.Duration("duration", time.Since(start)))
 	response.SuccessResponseHelper(w, responseObj, http.StatusOK)
 }
+
+// GetUserStatistics
 func (c *Controller) GetUserStatistics(limit, offset int, orderBy, sort string) (*models.UserStatistics, error) {
-	methodName := "GetAllUsers"
+	methodName := "GetUserStatistics"
 	c.Logger.Debug("method start", zap.String("method", methodName))
 	start := time.Now()
 
@@ -74,6 +76,7 @@ func (c *Controller) GetUserStatistics(limit, offset int, orderBy, sort string) 
 	return userStatistics, nil
 }
 
+// handleError
 func (c *Controller) handleError(methodName string, w http.ResponseWriter, err error, statusCode int) {
 	c.Logger.Error("method failed", zap.String("method", methodName), zap.Error(err))
 	response.ErrorResponseHelper(methodName, w, err.Error(), statusCode)
