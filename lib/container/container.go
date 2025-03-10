@@ -1,10 +1,14 @@
 package container
 
 import (
+	"context"
 	"fmt"
 	"strconv"
 
+	pb "github.com/syedomair/backend-microservices/protos/point"
 	"go.uber.org/zap"
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 	"gorm.io/gorm"
 )
 
@@ -30,6 +34,7 @@ type Container interface {
 	Db() *gorm.DB
 	Port() string
 	PprofEnable() string
+	PointServiceClient() PointServiceClient
 }
 
 type container struct {
@@ -38,6 +43,11 @@ type container struct {
 	port                 string
 	pprofEnable          string
 	environmentVariables map[string]string
+	pointServiceClient   PointServiceClient
+}
+
+type PointServiceClient interface {
+	GetUserPoints(ctx context.Context, in *pb.PointRequest, opts ...grpc.CallOption) (*pb.PointReply, error)
 }
 
 var _ Container = (*container)(nil)
@@ -84,9 +94,20 @@ func New(envVars map[string]string) (Container, error) {
 	if err != nil {
 		return c, err
 	}
+
+	conn, err := grpc.NewClient("point_service:8185", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	if err != nil {
+		return nil, fmt.Errorf("did not connect error: %v", err)
+	}
+	defer conn.Close()
+	c.pointServiceClient = pb.NewPointServerClient(conn)
+
 	return c, nil
 }
 
+func (c *container) PointServiceClient() PointServiceClient {
+	return c.pointServiceClient
+}
 func (c *container) dbSetup() (*gorm.DB, error) {
 	if c.db != nil {
 		return c.db, nil

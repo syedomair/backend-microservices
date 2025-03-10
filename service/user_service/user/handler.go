@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/mitchellh/mapstructure"
+	"github.com/syedomair/backend-microservices/lib/container"
 	"github.com/syedomair/backend-microservices/lib/request"
 	"github.com/syedomair/backend-microservices/lib/response"
 	"github.com/syedomair/backend-microservices/models"
@@ -15,8 +16,9 @@ import (
 )
 
 type Controller struct {
-	Logger *zap.Logger
-	Repo   Repository
+	Logger             *zap.Logger
+	Repo               Repository
+	PointServiceClient container.PointServiceClient
 }
 
 // GetAllUsers retrieves all users with additional statistics.
@@ -65,7 +67,7 @@ func (c *Controller) GetUserStatistics(limit, offset int, orderBy, sort string) 
 	c.Logger.Debug("method start", zap.String("method", methodName))
 	start := time.Now()
 
-	userService := NewUserService(c.Repo, c.Logger)
+	userService := NewUserService(c.Repo, c.Logger, c.PointServiceClient)
 
 	userStatistics, err := userService.GetAllUserStatistics(limit, offset, orderBy, sort)
 	if err != nil {

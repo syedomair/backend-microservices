@@ -1,13 +1,24 @@
 package user
 
 import (
+	"context"
 	"errors"
 	"testing"
 
 	"github.com/stretchr/testify/assert"
 	"github.com/syedomair/backend-microservices/models"
+	pb "github.com/syedomair/backend-microservices/protos/point"
 	"go.uber.org/zap"
+	"google.golang.org/grpc"
 )
+
+type mockPointServiceClient struct {
+	pb.PointServerClient
+}
+
+func (m *mockPointServiceClient) GetUserPoints(ctx context.Context, in *pb.PointRequest, opts ...grpc.CallOption) (*pb.PointReply, error) {
+	return &pb.PointReply{UserPoint: "100"}, nil
+}
 
 func TestGetAllUserStatistics_Success(t *testing.T) {
 	// Setup mock repository
@@ -34,10 +45,11 @@ func TestGetAllUserStatistics_Success(t *testing.T) {
 			return 100000.0, nil
 		},
 	}
+	pointServiceClient := &mockPointServiceClient{}
 
 	// Initialize service with mock repository
 	logger, _ := zap.NewProduction()
-	userService := NewUserService(mockRepo, logger)
+	userService := NewUserService(mockRepo, logger, pointServiceClient)
 
 	// Call the method under test
 	result, err := userService.GetAllUserStatistics(10, 0, "id", "asc")
@@ -82,9 +94,11 @@ func TestGetAllUserStatistics_ErrorInGetAllUserDB(t *testing.T) {
 		},
 	}
 
+	pointServiceClient := &mockPointServiceClient{}
+
 	// Initialize service with mock repository
 	logger, _ := zap.NewProduction()
-	userService := NewUserService(mockRepo, logger)
+	userService := NewUserService(mockRepo, logger, pointServiceClient)
 
 	// Call the method under test
 	result, err := userService.GetAllUserStatistics(10, 0, "id", "asc")
@@ -121,9 +135,11 @@ func TestGetAllUserStatistics_ErrorInGetUserHighAge(t *testing.T) {
 		},
 	}
 
+	pointServiceClient := &mockPointServiceClient{}
+
 	// Initialize service with mock repository
 	logger, _ := zap.NewProduction()
-	userService := NewUserService(mockRepo, logger)
+	userService := NewUserService(mockRepo, logger, pointServiceClient)
 
 	// Call the method under test
 	result, err := userService.GetAllUserStatistics(10, 0, "id", "asc")

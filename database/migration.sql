@@ -16,7 +16,7 @@ CREATE TABLE IF NOT EXISTS public.user (
     salary DOUBLE PRECISION CHECK (salary >= 0)  -- Ensures salary is non-negative
 );
 
-CREATE TABLE IF NOT EXISTS points (
+CREATE TABLE IF NOT EXISTS public.points (
     id UUID PRIMARY KEY DEFAULT uuid_generate_v4(),  -- Generate a new UUID by default
     user_id UUID REFERENCES public.user(id) ON DELETE SET NULL,  -- Foreign key constraint
     points INT 
