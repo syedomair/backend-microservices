@@ -14,7 +14,7 @@ import (
 	"google.golang.org/protobuf/encoding/protojson"
 
 	"github.com/syedomair/backend-microservices/lib/container"
-	pb "github.com/syedomair/backend-microservices/protos/point"
+	pb "github.com/syedomair/backend-microservices/service/user_service/pointserver/point"
 )
 
 /*
