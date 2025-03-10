@@ -9,5 +9,5 @@ type Points struct {
 
 // TableName Public
 func (Points) TableName() string {
-	return "points"
+	return "public.points"
 }

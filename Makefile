@@ -9,10 +9,19 @@ run_docker:
 	docker compose --env-file .env_local up       
 
 clean_docker:
-	clear
 	docker container rm -f $$(docker ps -aq)
+	docker rmi bmc-db
 	docker rmi bmc-user_service
 	docker rmi bmc-department_service
+	docker rmi bmc-point_service
+
+clean_point:
+	docker container rm -f $$(docker ps -aq)
+	docker rmi bmc-point_service
+
+clean_user:
+	docker container rm -f $$(docker ps -aq)
+	docker rmi bmc-user_service
 
 
 test: 

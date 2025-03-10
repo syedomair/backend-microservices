@@ -11,16 +11,18 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/stretchr/testify/assert"
+	"github.com/syedomair/backend-microservices/lib/container"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
 
 // MockContainer is a mock implementation of the container.Container interface
 type MockContainer struct {
-	port        string
-	logger      *zap.Logger
-	db          *gorm.DB
-	pprofEnable string
+	port               string
+	logger             *zap.Logger
+	db                 *gorm.DB
+	pprofEnable        string
+	pointServiceClient container.PointServiceClient
 }
 
 func (m *MockContainer) Port() string {
@@ -37,6 +39,9 @@ func (c *MockContainer) Db() *gorm.DB {
 
 func (c *MockContainer) PprofEnable() string {
 	return c.pprofEnable
+}
+func (c *MockContainer) PointServiceClient() container.PointServiceClient {
+	return c.pointServiceClient
 }
 
 func TestRun(t *testing.T) {

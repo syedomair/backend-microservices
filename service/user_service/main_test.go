@@ -11,16 +11,18 @@ import (
 
 	"github.com/go-chi/chi"
 	"github.com/stretchr/testify/assert"
+	"github.com/syedomair/backend-microservices/lib/container"
 	"go.uber.org/zap"
 	"gorm.io/gorm"
 )
 
 // MockContainer is a mock implementation of the container.Container interface
 type MockContainer struct {
-	port        string
-	logger      *zap.Logger
-	db          *gorm.DB
-	pprofEnable string
+	port               string
+	logger             *zap.Logger
+	db                 *gorm.DB
+	pprofEnable        string
+	pointServiceClient container.PointServiceClient
 }
 
 func (m *MockContainer) Port() string {
@@ -39,15 +41,20 @@ func (c *MockContainer) PprofEnable() string {
 	return c.pprofEnable
 }
 
+func (c *MockContainer) PointServiceClient() container.PointServiceClient {
+	return c.pointServiceClient
+}
+
 func TestRun(t *testing.T) {
 	// Create a mock logger
 	logger, _ := zap.NewDevelopment()
 
 	// Create a mock container
 	mockContainer := &MockContainer{
-		port:        "8080",
-		logger:      logger,
-		pprofEnable: "false",
+		port:               "8080",
+		logger:             logger,
+		pprofEnable:        "false",
+		pointServiceClient: nil,
 	}
 
 	// Create a mock router

@@ -38,6 +38,7 @@ RUN mkdir -p /src/lib/request
 RUN mkdir -p /src/lib/response
 RUN mkdir -p /src/lib/router
 RUN mkdir -p /src/models
+RUN mkdir -p /src/protos/point
 RUN mkdir -p /src/config
 
 WORKDIR /src/service/user_service/user
@@ -48,6 +49,9 @@ COPY /lib/. .
 
 WORKDIR /src/models
 COPY /models/. .
+
+WORKDIR /src/protos
+COPY /protos/. .
 
 WORKDIR /src/config
 COPY /config/. .
