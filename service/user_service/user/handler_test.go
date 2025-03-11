@@ -27,8 +27,9 @@ func TestGetAllUsers_Success(t *testing.T) {
 	}
 
 	controller := &Controller{
-		Logger: logger,
-		Repo:   mockRepo,
+		Logger:             logger,
+		Repo:               mockRepo,
+		PointServiceClient: &mockPointServiceClient{},
 	}
 
 	req, err := http.NewRequest("GET", "/users", nil)
@@ -138,8 +139,9 @@ func TestGetAllUsers_StatisticsError(t *testing.T) {
 	}
 
 	controller := &Controller{
-		Logger: logger,
-		Repo:   mockRepo,
+		Logger:             logger,
+		Repo:               mockRepo,
+		PointServiceClient: &mockPointServiceClient{},
 	}
 
 	req, err := http.NewRequest("GET", "/users", nil)
