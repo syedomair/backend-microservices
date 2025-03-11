@@ -99,7 +99,7 @@ func New(envVars map[string]string) (Container, error) {
 	if err != nil {
 		return nil, fmt.Errorf("did not connect error: %v", err)
 	}
-	defer conn.Close()
+	//defer conn.Close()
 	c.pointServiceClient = pb.NewPointServerClient(conn)
 
 	return c, nil
