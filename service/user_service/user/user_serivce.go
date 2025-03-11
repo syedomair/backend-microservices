@@ -50,8 +50,10 @@ func (u *UserService) GetAllUserStatistics(limit, offset int, orderBy, sort stri
 
 		for _, user := range userList {
 			u.logger.Debug("fetch user points", zap.String("user_id", user.ID))
-			ctx, cancel := context.WithTimeout(ctx, time.Second)
-			defer cancel()
+			/*
+				ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
+				defer cancel()
+			*/
 
 			r, err := u.pointServiceClient.GetUserPoints(ctx, &pb.PointRequest{UserId: user.ID})
 			if err != nil {
