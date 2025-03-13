@@ -11,6 +11,7 @@ import (
 	"github.com/syedomair/backend-microservices/lib/request"
 	"github.com/syedomair/backend-microservices/lib/response"
 	"github.com/syedomair/backend-microservices/models"
+	pb "github.com/syedomair/backend-microservices/protos/point"
 
 	"go.uber.org/zap"
 )
@@ -67,7 +68,8 @@ func (c *Controller) GetUserStatistics(limit, offset int, orderBy, sort string) 
 	c.Logger.Debug("method start", zap.String("method", methodName))
 	start := time.Now()
 
-	userService := NewUserService(c.Repo, c.Logger, c.PointServiceConnectionPool)
+	var pointServerClient pb.PointServerClient
+	userService := NewUserService(c.Repo, c.Logger, pointServerClient, c.PointServiceConnectionPool)
 
 	userStatistics, err := userService.GetAllUserStatistics(limit, offset, orderBy, sort)
 	if err != nil {
