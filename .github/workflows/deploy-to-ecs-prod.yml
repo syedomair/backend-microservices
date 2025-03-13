@@ -55,6 +55,8 @@ jobs:
             --build-arg zapConf=${ZAP_CONF} \
             --build-arg gormConf=${GORM_CONF} \
             --build-arg pprofEnable=${PPROF_ENABLE}  \
+            --build-arg pointSrvcAddrEnvVar=${POINT_SRVC_ADDR} \
+            --build-arg pointSrvcMaxEnvVar=${POINT_SRVC_MAX}  \
             -t ${{secrets.AWS_ECR_URI}}user-service-production:latest \
             -f service/user_service/Dockerfile  \
             .
@@ -78,6 +80,8 @@ jobs:
             --build-arg zapConf=${ZAP_CONF} \
             --build-arg gormConf=${GORM_CONF} \
             --build-arg pprofEnable=${PPROF_ENABLE}  \
+            --build-arg pointSrvcAddrEnvVar=${POINT_SRVC_ADDR} \
+            --build-arg pointSrvcMaxEnvVar=${POINT_SRVC_MAX}  \
             -t ${{secrets.AWS_ECR_URI}}department-service-production:latest \
             -f service/department_service/Dockerfile  \
             .

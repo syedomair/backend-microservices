@@ -38,6 +38,8 @@ services:
       - ZAP_CONF=${ZAP_CONF}
       - GORM_CONF=${GORM_CONF}
       - PPROF_ENABLE=${PPROF_ENABLE}
+      - POINT_SRVC_ADDR=${POINT_SRVC_ADDR}
+      - POINT_SRVC_MAX=${POINT_SRVC_MAX}
     build:
       context: .
       dockerfile: service/user_service/Dockerfile
@@ -54,6 +56,8 @@ services:
         - zapConf=${ZAP_CONF}
         - gormConf=${GORM_CONF}
         - pprofEnable=${PPROF_ENABLE}
+        - pointSrvcAddrEnvVar=${POINT_SRVC_ADDR}
+        - pointSrvcMaxEnvVar=${POINT_SRVC_MAX}
     ports:
       - "5001:8185"
     volumes:
@@ -76,6 +80,8 @@ services:
       - ZAP_CONF=${ZAP_CONF}
       - GORM_CONF=${GORM_CONF}
       - PPROF_ENABLE=${PPROF_ENABLE}
+      - POINT_SRVC_ADDR=${POINT_SRVC_ADDR}
+      - POINT_SRVC_MAX=${POINT_SRVC_MAX}
     build:
       context: .
       dockerfile: service/department_service/Dockerfile
@@ -92,6 +98,8 @@ services:
         - zapConf=${ZAP_CONF}
         - gormConf=${GORM_CONF}
         - pprofEnable=${PPROF_ENABLE}
+        - pointSrvcAddrEnvVar=${POINT_SRVC_ADDR}
+        - pointSrvcMaxEnvVar=${POINT_SRVC_MAX}
     ports:
       - "5002:8185"
     volumes:
@@ -114,6 +122,8 @@ services:
       - ZAP_CONF=${ZAP_CONF}
       - GORM_CONF=${GORM_CONF}
       - PPROF_ENABLE=${PPROF_ENABLE}
+      - POINT_SRVC_ADDR=${POINT_SRVC_ADDR}
+      - POINT_SRVC_MAX=${POINT_SRVC_MAX}
     build:
       context: .
       dockerfile: service/point_service/Dockerfile
@@ -130,6 +140,8 @@ services:
         - zapConf=${ZAP_CONF}
         - gormConf=${GORM_CONF}
         - pprofEnable=${PPROF_ENABLE}
+        - pointSrvcAddrEnvVar=${POINT_SRVC_ADDR}
+        - pointSrvcMaxEnvVar=${POINT_SRVC_MAX}
     ports:
       - "5003:8185"
     volumes:

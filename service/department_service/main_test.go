@@ -18,11 +18,11 @@ import (
 
 // MockContainer is a mock implementation of the container.Container interface
 type MockContainer struct {
-	port               string
-	logger             *zap.Logger
-	db                 *gorm.DB
-	pprofEnable        string
-	pointServiceClient container.PointServiceClient
+	port             string
+	logger           *zap.Logger
+	db               *gorm.DB
+	pprofEnable      string
+	pointServicePool *container.ConnectionPool
 }
 
 func (m *MockContainer) Port() string {
@@ -36,12 +36,11 @@ func (m *MockContainer) Logger() *zap.Logger {
 func (c *MockContainer) Db() *gorm.DB {
 	return c.db
 }
-
 func (c *MockContainer) PprofEnable() string {
 	return c.pprofEnable
 }
-func (c *MockContainer) PointServiceClient() container.PointServiceClient {
-	return c.pointServiceClient
+func (c *MockContainer) PointServicePool() container.ConnectionPoolInterface {
+	return c.pointServicePool
 }
 
 func TestRun(t *testing.T) {

@@ -29,6 +29,8 @@ func main() {
 		container.ZapConf:       os.Getenv(container.ZapConf),
 		container.GormConf:      os.Getenv(container.GormConf),
 		container.PprofEnable:   os.Getenv(container.PprofEnable),
+		container.PointSrvcAddr: os.Getenv(container.PointSrvcAddr),
+		container.PointSrvcMax:  os.Getenv(container.PointSrvcMax),
 	})
 	if err != nil {
 		defer func() {
