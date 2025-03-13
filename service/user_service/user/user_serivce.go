@@ -20,12 +20,12 @@ type PointServiceClientInterface interface {
 type UserService struct {
 	repo                       Repository
 	logger                     *zap.Logger
-	pointServiceClient         pb.PointServerClient
+	pointServiceClient         PointServiceClientInterface
 	pointServiceConnectionPool container.ConnectionPoolInterface
 }
 
-func NewUserService(repo Repository, logger *zap.Logger, pool container.ConnectionPoolInterface) *UserService {
-	return &UserService{repo: repo, logger: logger, pointServiceConnectionPool: pool}
+func NewUserService(repo Repository, logger *zap.Logger, pointServiceClient PointServiceClientInterface, pool container.ConnectionPoolInterface) *UserService {
+	return &UserService{repo: repo, logger: logger, pointServiceClient: pointServiceClient, pointServiceConnectionPool: pool}
 }
 
 // GetAllUserStatistics
