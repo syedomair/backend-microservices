@@ -43,6 +43,34 @@ func (m *MockConnectionPool) Put(conn *grpc.ClientConn) {
 }
 func (m *MockConnectionPool) Close() {}
 
+func setupGRPCServer(t *testing.T) (pb.PointServerClient, *grpc.ClientConn, *bufconn.Listener) {
+	const bufSize = 1024 * 1024
+	listener := bufconn.Listen(bufSize)
+	srv := grpc.NewServer()
+	pb.RegisterPointServerServer(srv, &MockPointServiceClient{}) // Register the mock service
+
+	go func() {
+		if err := srv.Serve(listener); err != nil {
+			t.Errorf("Server exited with error: %v", err)
+		}
+	}()
+
+	conn, err := grpc.NewClient(
+		"bufnet",
+		grpc.WithContextDialer(func(ctx context.Context, s string) (net.Conn, error) {
+			return listener.Dial()
+		}),
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	)
+	if err != nil {
+		t.Fatalf("Failed to dial bufnet: %v", err)
+	}
+
+	client := pb.NewPointServerClient(conn)
+
+	return client, conn, listener
+}
+
 func TestGetAllUserStatistics_Success(t *testing.T) {
 	// Setup mock repository
 	mockRepo := &MockRepository{
@@ -69,28 +97,7 @@ func TestGetAllUserStatistics_Success(t *testing.T) {
 		},
 	}
 
-	// Create a bufconn listener and server
-	const bufSize = 1024 * 1024
-	listener := bufconn.Listen(bufSize)
-	srv := grpc.NewServer()
-	pb.RegisterPointServerServer(srv, &MockPointServiceClient{}) //Register the mock service
-
-	go func() {
-		if err := srv.Serve(listener); err != nil {
-			t.Errorf("Server exited with error: %v", err)
-		}
-	}()
-
-	conn, err := grpc.NewClient(
-		"bufnet",
-		grpc.WithContextDialer(func(ctx context.Context, s string) (net.Conn, error) {
-			return listener.Dial()
-		}),
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
-	)
-	if err != nil {
-		t.Fatalf("Failed to dial bufnet: %v", err)
-	}
+	pointServiceClient, conn, _ := setupGRPCServer(t) // Use the helper function
 	defer conn.Close()
 
 	mockConnectionPool := &MockConnectionPool{
@@ -101,8 +108,6 @@ func TestGetAllUserStatistics_Success(t *testing.T) {
 			// Do nothing in the mock
 		},
 	}
-
-	pointServiceClient := pb.NewPointServerClient(conn)
 
 	// Initialize service with mock repository
 	logger, _ := zap.NewProduction()
@@ -125,7 +130,6 @@ func TestGetAllUserStatistics_Success(t *testing.T) {
 	}, result)
 }
 
-/*
 func TestGetAllUserStatistics_ErrorInGetAllUserDB(t *testing.T) {
 
 	mockRepo := &MockRepository{
@@ -152,11 +156,20 @@ func TestGetAllUserStatistics_ErrorInGetAllUserDB(t *testing.T) {
 		},
 	}
 
-	pointServiceClient := &mockPointServiceClient{}
+	pointServiceClient, conn, _ := setupGRPCServer(t) // Use the helper function
+	defer conn.Close()
 
+	mockConnectionPool := &MockConnectionPool{
+		GetFunc: func() (*grpc.ClientConn, error) {
+			return conn, nil
+		},
+		PutFunc: func(conn *grpc.ClientConn) {
+			// Do nothing in the mock
+		},
+	}
 	// Initialize service with mock repository
 	logger, _ := zap.NewProduction()
-	userService := NewUserService(mockRepo, logger, pointServiceClient)
+	userService := NewUserService(mockRepo, logger, pointServiceClient, mockConnectionPool)
 
 	// Call the method under test
 	result, err := userService.GetAllUserStatistics(10, 0, "id", "asc")
@@ -193,12 +206,20 @@ func TestGetAllUserStatistics_ErrorInGetUserHighAge(t *testing.T) {
 		},
 	}
 
-	pointServiceClient := &mockPointServiceClient{}
-	pointServiceClient := &mockPointServiceClient{}
+	pointServiceClient, conn, _ := setupGRPCServer(t) // Use the helper function
+	defer conn.Close()
 
+	mockConnectionPool := &MockConnectionPool{
+		GetFunc: func() (*grpc.ClientConn, error) {
+			return conn, nil
+		},
+		PutFunc: func(conn *grpc.ClientConn) {
+			// Do nothing in the mock
+		},
+	}
 	// Initialize service with mock repository
 	logger, _ := zap.NewProduction()
-	userService := NewUserService(mockRepo, logger, pointServiceClient)
+	userService := NewUserService(mockRepo, logger, pointServiceClient, mockConnectionPool)
 
 	// Call the method under test
 	result, err := userService.GetAllUserStatistics(10, 0, "id", "asc")
@@ -208,5 +229,3 @@ func TestGetAllUserStatistics_ErrorInGetUserHighAge(t *testing.T) {
 	assert.Equal(t, "database error", err.Error())
 	assert.Nil(t, result)
 }
-
-*/
