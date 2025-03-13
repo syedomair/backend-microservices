@@ -54,8 +54,8 @@ COPY /lib/. .
 WORKDIR /src/models
 COPY /models/. .
 
-WORKDIR /src/protos
-COPY /protos/. .
+WORKDIR /src/proto
+COPY /proto/. .
 
 WORKDIR /src/config
 COPY /config/. .

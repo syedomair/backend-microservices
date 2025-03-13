@@ -36,7 +36,7 @@ ENV POINT_SRVC_MAX=$pointSrvcMaxEnvVar
 RUN apk update && apk upgrade && apk add --no-cache ca-certificates git
 RUN update-ca-certificates
 
-RUN mkdir -p /src/service/point_service/pointserver/point
+RUN mkdir -p /src/service/point_service/point
 RUN mkdir -p /src/lib/container
 RUN mkdir -p /src/lib/request
 RUN mkdir -p /src/lib/response
@@ -45,8 +45,8 @@ RUN mkdir -p /src/models
 RUN mkdir -p /src/protos/point
 RUN mkdir -p /src/config
 
-WORKDIR /src/service/point_service/pointserver
-COPY /service/point_service/pointserver/. .
+WORKDIR /src/service/point_service/point
+COPY /service/point_service/point/. .
 
 WORKDIR /src/lib
 COPY /lib/. .
@@ -54,8 +54,8 @@ COPY /lib/. .
 WORKDIR /src/models
 COPY /models/. .
 
-WORKDIR /src/protos
-COPY /protos/. .
+WORKDIR /src/proto
+COPY /proto/. .
 
 WORKDIR /src/config
 COPY /config/. .
