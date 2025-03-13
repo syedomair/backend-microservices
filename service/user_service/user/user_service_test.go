@@ -8,7 +8,7 @@ import (
 
 	"github.com/stretchr/testify/assert"
 	"github.com/syedomair/backend-microservices/models"
-	pb "github.com/syedomair/backend-microservices/protos/point"
+	pb "github.com/syedomair/backend-microservices/proto/v1/point"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"

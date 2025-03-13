@@ -1,4 +1,4 @@
-package pointserver
+package point
 
 import (
 	"context"
@@ -14,15 +14,8 @@ import (
 	"google.golang.org/protobuf/encoding/protojson"
 
 	"github.com/syedomair/backend-microservices/lib/container"
-	pb "github.com/syedomair/backend-microservices/protos/point"
+	pb "github.com/syedomair/backend-microservices/proto/v1/point"
 )
-
-/*
-type Controller struct {
-	Logger *zap.Logger
-	Repo   Repository
-}
-*/
 
 var (
 	netListen          = net.Listen
@@ -82,31 +75,8 @@ func NewServer(c container.Container) (Server, error) {
 	}
 	server.listener = listener
 	server.container = c
-	//server.poetryDb = poetrydb.NewPoetryDb(config.PoetrydbBaseUrl, config.PoetrydbHttpTimeout)
 	server.grpcServer = grpc.NewServer()
-	//poetry.RegisterProtobufServiceServer(server.grpcServer, server)
-	//reflection.Register(server.grpcServer)
 	pb.RegisterPointServerServer(server.grpcServer, server)
 
 	return server, nil
 }
-
-/*
-func (s *server) RandomPoetries(ctx context.Context, in *poetry.RandomPoetriesRequest) (*poetry.PoetryList, error) {
-	pbPoetryList := new(poetry.PoetryList)
-	poetryList, err := s.poetryDb.Random(int(in.NumberOfPoetries))
-	if err != nil {
-		return pbPoetryList, errors.Wrap(err, "requesting random poetry")
-	}
-	json, err := jsonMarshal(poetryList)
-	if err != nil {
-		return pbPoetryList, errors.Wrap(err, "marshalling json")
-	}
-	err = protojsonUnmarshal(json, pbPoetryList)
-	if err != nil {
-		return pbPoetryList, errors.Wrap(err, "unmarshalling proto")
-	}
-	return pbPoetryList, nil
-}
-
-*/

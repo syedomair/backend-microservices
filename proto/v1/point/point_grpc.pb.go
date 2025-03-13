@@ -2,7 +2,7 @@
 // versions:
 // - protoc-gen-go-grpc v1.5.1
 // - protoc             v3.12.4
-// source: point/point.proto
+// source: proto/v1/point/point.proto
 
 package point
 
@@ -117,5 +117,5 @@ var PointServer_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "point/point.proto",
+	Metadata: "proto/v1/point/point.proto",
 }

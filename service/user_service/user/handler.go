@@ -11,7 +11,7 @@ import (
 	"github.com/syedomair/backend-microservices/lib/request"
 	"github.com/syedomair/backend-microservices/lib/response"
 	"github.com/syedomair/backend-microservices/models"
-	pb "github.com/syedomair/backend-microservices/protos/point"
+	pb "github.com/syedomair/backend-microservices/proto/v1/point"
 
 	"go.uber.org/zap"
 )

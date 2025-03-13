@@ -2,7 +2,7 @@ syntax = "proto3";
 
 package point;
 
-option go_package = "github.com/syedomair/backend-microservices/protos/point";
+option go_package = "github.com/syedomair/backend-microservices/proto/v1/point";
 
 message PointRequest {
     string user_id = 1;

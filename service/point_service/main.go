@@ -11,7 +11,7 @@ import (
 	"github.com/syedomair/backend-microservices/lib/container"
 	"go.uber.org/zap"
 
-	server "github.com/syedomair/backend-microservices/service/point_service/pointserver"
+	server "github.com/syedomair/backend-microservices/service/point_service/point"
 )
 
 func main() {
