@@ -9,9 +9,9 @@ import (
 func EndPointConf(c container.Container) []router.EndPoint {
 
 	userController := user.Controller{
-		Logger:             c.Logger(),
-		Repo:               user.NewDBRepository(c.Db(), c.Logger()),
-		PointServiceClient: c.PointServiceClient(),
+		Logger:                     c.Logger(),
+		Repo:                       user.NewDBRepository(c.Db(), c.Logger()),
+		PointServiceConnectionPool: c.PointServicePool(),
 	}
 
 	return []router.EndPoint{

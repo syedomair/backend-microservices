@@ -1,14 +1,10 @@
 package container
 
 import (
-	"context"
 	"fmt"
 	"strconv"
 
-	pb "github.com/syedomair/backend-microservices/protos/point"
 	"go.uber.org/zap"
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
 	"gorm.io/gorm"
 )
 
@@ -24,8 +20,11 @@ const (
 	ZapConf       = "ZAP_CONF"
 	GormConf      = "GORM_CONF"
 	PprofEnable   = "PPROF_ENABLE"
-	Postgres      = "POSTGRES"
-	Mysql         = "MYSQL"
+	PointSrvcAddr = "POINT_SRVC_ADDR"
+	PointSrvcMax  = "POINT_SRVC_MAX"
+
+	Postgres = "POSTGRES"
+	Mysql    = "MYSQL"
 )
 
 // Container interface
@@ -34,7 +33,7 @@ type Container interface {
 	Db() *gorm.DB
 	Port() string
 	PprofEnable() string
-	PointServiceClient() PointServiceClient
+	PointServicePool() ConnectionPoolInterface
 }
 
 type container struct {
@@ -43,17 +42,19 @@ type container struct {
 	port                 string
 	pprofEnable          string
 	environmentVariables map[string]string
-	pointServiceClient   PointServiceClient
-}
-
-type PointServiceClient interface {
-	GetUserPoints(ctx context.Context, in *pb.PointRequest, opts ...grpc.CallOption) (*pb.PointReply, error)
+	pointSrvcAddr        string
+	pointSrvcMax         string
+	pointServicePool     ConnectionPoolInterface
 }
 
 var _ Container = (*container)(nil)
 
 func (c *container) Db() *gorm.DB {
 	return c.db
+}
+
+func (c *container) PointServicePool() ConnectionPoolInterface {
+	return c.pointServicePool
 }
 
 func New(envVars map[string]string) (Container, error) {
@@ -67,11 +68,13 @@ func New(envVars map[string]string) (Container, error) {
 		DBMaxOpen,
 		DBMaxLifeTime,
 		DBMaxIdleTime,
+		PointSrvcAddr,
+		PointSrvcMax,
 	}
 
 	for _, key := range requiredKeys {
 		if _, ok := envVars[key]; !ok {
-			return nil, fmt.Errorf("missing mandatory envvar: %q", key)
+			return nil, fmt.Errorf("missing mandatory envvar: %v", key)
 		}
 	}
 
@@ -95,19 +98,19 @@ func New(envVars map[string]string) (Container, error) {
 		return c, err
 	}
 
-	conn, err := grpc.NewClient("point_service:8185", grpc.WithTransportCredentials(insecure.NewCredentials()))
+	pointSrvcMax, err := c.getIntEnvVar(c.pointSrvcMax)
+	if err != nil {
+		return nil, err
+	}
+
+	c.pointServicePool, err = NewConnectionPool(c.pointSrvcAddr, pointSrvcMax)
 	if err != nil {
 		return nil, fmt.Errorf("did not connect error: %v", err)
 	}
-	//defer conn.Close()
-	c.pointServiceClient = pb.NewPointServerClient(conn)
 
 	return c, nil
 }
 
-func (c *container) PointServiceClient() PointServiceClient {
-	return c.pointServiceClient
-}
 func (c *container) dbSetup() (*gorm.DB, error) {
 	if c.db != nil {
 		return c.db, nil

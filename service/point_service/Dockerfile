@@ -15,6 +15,8 @@ ARG dBMaxIdleTimeEnvVar=""
 ARG zapConf=""
 ARG gormConf=""
 ARG pprofEnable=""
+ARG pointSrvcAddrEnvVar=""
+ARG pointSrvcMaxEnvVar=""
 
 ENV LOG_LEVEL=$logLevelEnvVar
 ENV DATABASE_URL=$databaseURLEnvVar
@@ -27,6 +29,8 @@ ENV DB_MAX_IDLE_TIME=$dBMaxIdleTimeEnvVar
 ENV ZAP_CONF=$zapConf
 ENV GORM_CONF=$gormConf
 ENV PPROF_ENABLE=$pprofEnable
+ENV POINT_SRVC_ADDR=$pointSrvcAddrEnvVar
+ENV POINT_SRVC_MAX=$pointSrvcMaxEnvVar
 
 # Install dependencies
 RUN apk update && apk upgrade && apk add --no-cache ca-certificates git

@@ -10,16 +10,22 @@ import (
 	pb "github.com/syedomair/backend-microservices/protos/point"
 	"go.uber.org/zap"
 	"golang.org/x/sync/errgroup"
+	"google.golang.org/grpc"
 )
 
-type UserService struct {
-	repo               Repository
-	logger             *zap.Logger
-	pointServiceClient container.PointServiceClient
+type PointServiceClientInterface interface {
+	GetUserPoints(ctx context.Context, in *pb.PointRequest, opts ...grpc.CallOption) (*pb.PointReply, error)
 }
 
-func NewUserService(repo Repository, logger *zap.Logger, pointServiceClient container.PointServiceClient) *UserService {
-	return &UserService{repo: repo, logger: logger, pointServiceClient: pointServiceClient}
+type UserService struct {
+	repo                       Repository
+	logger                     *zap.Logger
+	pointServiceClient         pb.PointServerClient
+	pointServiceConnectionPool container.ConnectionPoolInterface
+}
+
+func NewUserService(repo Repository, logger *zap.Logger, pool container.ConnectionPoolInterface) *UserService {
+	return &UserService{repo: repo, logger: logger, pointServiceConnectionPool: pool}
 }
 
 // GetAllUserStatistics
@@ -28,7 +34,7 @@ func (u *UserService) GetAllUserStatistics(limit, offset int, orderBy, sort stri
 	u.logger.Debug("method start", zap.String("method_name", methodName))
 	start := time.Now()
 
-	g, ctx := errgroup.WithContext(context.Background())
+	g, _ := errgroup.WithContext(context.Background())
 
 	var (
 		userList          []*models.User
@@ -48,18 +54,27 @@ func (u *UserService) GetAllUserStatistics(limit, offset int, orderBy, sort stri
 			return err
 		}
 
+		conn, err := u.pointServiceConnectionPool.Get()
+		if err != nil {
+			return fmt.Errorf("failed to get connection from pool: %v", err)
+		}
+		defer u.pointServiceConnectionPool.Put(conn)
+
+		client := pb.NewPointServerClient(conn)
+
 		for _, user := range userList {
 			u.logger.Debug("fetch user points", zap.String("user_id", user.ID))
-			/*
-				ctx, cancel := context.WithTimeout(ctx, 5*time.Second)
-				defer cancel()
-			*/
 
-			r, err := u.pointServiceClient.GetUserPoints(ctx, &pb.PointRequest{UserId: user.ID})
+			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+			defer cancel()
+
+			r, err := client.GetUserPoints(ctx, &pb.PointRequest{UserId: user.ID})
 			if err != nil {
-				return fmt.Errorf("could not get Points for user %s: %v", user.ID, err)
+				u.logger.Error("failed to get user points", zap.Error(err), zap.String("userID", user.ID))
+				continue
 			}
 			u.logger.Debug("user points", zap.String("user_id", user.ID), zap.String("user points", r.GetUserPoint()))
+
 		}
 
 		return nil
