@@ -5,7 +5,7 @@ import (
 	"log"
 	"time"
 
-	pb "github.com/syedomair/backend-microservices/service/point_service/pointserver/point"
+	pb "github.com/syedomair/backend-microservices/proto/v1/point"
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"

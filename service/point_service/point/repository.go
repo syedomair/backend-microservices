@@ -1,4 +1,4 @@
-package pointserver
+package point
 
 // Repository interface
 type Repository interface {
