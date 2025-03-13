@@ -42,8 +42,6 @@ type container struct {
 	port                 string
 	pprofEnable          string
 	environmentVariables map[string]string
-	pointSrvcAddr        string
-	pointSrvcMax         string
 	pointServicePool     ConnectionPoolInterface
 }
 
@@ -98,12 +96,17 @@ func New(envVars map[string]string) (Container, error) {
 		return c, err
 	}
 
-	pointSrvcMax, err := c.getIntEnvVar(c.pointSrvcMax)
+	pointSrvcAddr, err := c.getRequiredEnvVar(PointSrvcAddr)
 	if err != nil {
 		return nil, err
 	}
 
-	c.pointServicePool, err = NewConnectionPool(c.pointSrvcAddr, pointSrvcMax)
+	pointSrvcMax, err := c.getIntEnvVar(PointSrvcMax)
+	if err != nil {
+		return nil, err
+	}
+
+	c.pointServicePool, err = NewConnectionPool(pointSrvcAddr, pointSrvcMax)
 	if err != nil {
 		return nil, fmt.Errorf("did not connect error: %v", err)
 	}
