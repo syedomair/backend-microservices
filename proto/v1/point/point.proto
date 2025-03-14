@@ -12,7 +12,15 @@ message PointReply {
     string user_point = 1;
 }
 
-service PointServer {
-    rpc GetUserPoints(PointRequest) returns (PointReply);
+message UserListRequest {
+    repeated string user_ids = 1;
 }
 
+message UserListPointResponse {
+    map<string, int32> user_points = 1;
+}
+
+service PointServer {
+    rpc GetUserPoints(PointRequest) returns (PointReply);
+    rpc GetUserListPoints(UserListRequest) returns (UserListPointResponse);
+}
