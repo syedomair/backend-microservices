@@ -6,6 +6,10 @@ import (
 	"go.uber.org/zap"
 )
 
+type PointServiceInterface interface {
+	GetUserPoints(userID string) (int, error)
+}
+
 type PointService struct {
 	repo   Repository
 	logger *zap.Logger
