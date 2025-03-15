@@ -7,7 +7,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/syedomair/backend-microservices/lib/mockcontainer"
+	"github.com/syedomair/backend-microservices/lib/mockgrpc"
 	"github.com/syedomair/backend-microservices/models"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -28,10 +28,10 @@ func TestGetAllUsers_Success(t *testing.T) {
 		GetUserAvgSalaryFunc:  func() (float64, error) { return 65000.0, nil },
 	}
 
-	_, conn, _ := mockcontainer.SetupGRPCServer(t) // Use the helper function
+	_, conn, _ := mockgrpc.SetupGRPCServer(t) // Use the helper function
 	defer conn.Close()
 
-	mockConnectionPool := &mockcontainer.MockConnectionPool{
+	mockConnectionPool := &mockgrpc.MockConnectionPool{
 		GetFunc: func() (*grpc.ClientConn, error) {
 			return conn, nil
 		},
@@ -152,10 +152,10 @@ func TestGetAllUsers_StatisticsError(t *testing.T) {
 		},
 	}
 
-	_, conn, _ := mockcontainer.SetupGRPCServer(t) // Use the helper function
+	_, conn, _ := mockgrpc.SetupGRPCServer(t) // Use the helper function
 	defer conn.Close()
 
-	mockConnectionPool := &mockcontainer.MockConnectionPool{
+	mockConnectionPool := &mockgrpc.MockConnectionPool{
 		GetFunc: func() (*grpc.ClientConn, error) {
 			return conn, nil
 		},

@@ -81,22 +81,7 @@ func (u *UserService) GetAllUserStatistics(limit, offset int, orderBy, sort stri
 			u.logger.Debug("user points", zap.String("user_id", k), zap.Any("points", v))
 		}
 
-		/*
-			for _, user := range userList {
-				u.logger.Debug("fetch user points", zap.String("user_id", user.ID))
-
-				ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-				defer cancel()
-
-				r, err := client.GetUserPoints(ctx, &pb.PointRequest{UserId: user.ID})
-				if err != nil {
-					u.logger.Error("failed to get user points", zap.Error(err), zap.String("userID", user.ID))
-					continue
-				}
-				u.logger.Debug("user points", zap.String("user_id", user.ID), zap.String("user points", r.GetUserPoint()))
-
-			}
-		*/
+		userList = updateUserListWithPoints(userList, userPoints)
 
 		return nil
 
@@ -173,4 +158,13 @@ func (u *UserService) GetAllUserStatistics(limit, offset int, orderBy, sort stri
 
 	u.logger.Debug("method end", zap.String("method_name", methodName), zap.Duration("since", time.Since(start)))
 	return userStatistics, nil
+}
+
+func updateUserListWithPoints(userList []*models.User, userPoints map[string]int32) []*models.User {
+	for _, user := range userList {
+		if points, ok := userPoints[user.ID]; ok {
+			user.Point = int(points)
+		}
+	}
+	return userList
 }

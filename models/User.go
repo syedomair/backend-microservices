@@ -8,6 +8,7 @@ type User struct {
 	DepartmentID string  `json:"department_id" gorm:"column:department_id"`
 	Age          int     `json:"age" gorm:"column:age"`
 	Salary       float32 `json:"salary" gorm:"column:salary"`
+	Point        int     `json:"point" gorm:"column:point"`
 }
 
 // TableName Public
