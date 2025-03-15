@@ -5,7 +5,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/assert"
-	"github.com/syedomair/backend-microservices/lib/mockcontainer"
+	"github.com/syedomair/backend-microservices/lib/mockgrpc"
 	"github.com/syedomair/backend-microservices/models"
 	"go.uber.org/zap"
 	"google.golang.org/grpc"
@@ -15,7 +15,7 @@ func TestGetAllUserStatistics_Success(t *testing.T) {
 	// Setup mock repository
 	mockRepo := &MockRepository{
 		GetAllUserDBFunc: func(limit, offset int, orderBy, sort string) ([]*models.User, string, error) {
-			return []*models.User{{ID: "1", Name: "John"}}, "100", nil
+			return []*models.User{{ID: "1", Name: "John", Point: 10}}, "100", nil
 		},
 		GetUserHighAgeFunc: func() (int, error) {
 			return 40, nil
@@ -37,10 +37,10 @@ func TestGetAllUserStatistics_Success(t *testing.T) {
 		},
 	}
 
-	pointServiceClient, conn, _ := mockcontainer.SetupGRPCServer(t) // Use the helper function
+	pointServiceClient, conn, _ := mockgrpc.SetupGRPCServer(t) // Use the helper function
 	defer conn.Close()
 
-	mockConnectionPool := &mockcontainer.MockConnectionPool{
+	mockConnectionPool := &mockgrpc.MockConnectionPool{
 		GetFunc: func() (*grpc.ClientConn, error) {
 			return conn, nil
 		},
@@ -59,7 +59,7 @@ func TestGetAllUserStatistics_Success(t *testing.T) {
 	// Assertions
 	assert.NoError(t, err)
 	assert.Equal(t, &models.UserStatistics{
-		UserList:       []*models.User{{ID: "1", Name: "John"}},
+		UserList:       []*models.User{{ID: "1", Name: "John", Point: 10}},
 		Count:          "100",
 		UserHighAge:    40,
 		UserLowAge:     20,
@@ -96,10 +96,10 @@ func TestGetAllUserStatistics_ErrorInGetAllUserDB(t *testing.T) {
 		},
 	}
 
-	pointServiceClient, conn, _ := mockcontainer.SetupGRPCServer(t) // Use the helper function
+	pointServiceClient, conn, _ := mockgrpc.SetupGRPCServer(t) // Use the helper function
 	defer conn.Close()
 
-	mockConnectionPool := &mockcontainer.MockConnectionPool{
+	mockConnectionPool := &mockgrpc.MockConnectionPool{
 		GetFunc: func() (*grpc.ClientConn, error) {
 			return conn, nil
 		},
@@ -146,10 +146,10 @@ func TestGetAllUserStatistics_ErrorInGetUserHighAge(t *testing.T) {
 		},
 	}
 
-	pointServiceClient, conn, _ := mockcontainer.SetupGRPCServer(t) // Use the helper function
+	pointServiceClient, conn, _ := mockgrpc.SetupGRPCServer(t) // Use the helper function
 	defer conn.Close()
 
-	mockConnectionPool := &mockcontainer.MockConnectionPool{
+	mockConnectionPool := &mockgrpc.MockConnectionPool{
 		GetFunc: func() (*grpc.ClientConn, error) {
 			return conn, nil
 		},
