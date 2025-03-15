@@ -1,7 +1,6 @@
 package main
 
 import (
-	"fmt"
 	"log"
 	"os/signal"
 	"syscall"
@@ -36,7 +35,6 @@ func main() {
 		panic("server initialization failed")
 	}
 
-	fmt.Println("DATABASE URL-------------------------------------------------", os.Getenv(container.DatabaseURL))
 	shutdown := make(chan os.Signal, 1)
 	signal.Notify(shutdown, os.Interrupt, syscall.SIGTERM)
 	serverErrors := make(chan error, 1)

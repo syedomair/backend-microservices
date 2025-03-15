@@ -20,6 +20,12 @@ type MockPointServiceClient struct {
 func (m *MockPointServiceClient) GetUserPoints(ctx context.Context, in *pb.PointRequest) (*pb.PointReply, error) {
 	return &pb.PointReply{UserPoint: "100"}, nil
 }
+func (m *MockPointServiceClient) GetUserListPoints(ctx context.Context, in *pb.UserListRequest) (*pb.UserListPointResponse, error) {
+	mapUserPoints := make(map[string]int32)
+	mapUserPoints["1"] = 10
+	mapUserPoints["2"] = 20
+	return &pb.UserListPointResponse{UserPoints: mapUserPoints}, nil
+}
 
 type MockConnectionPool struct {
 	GetFunc func() (*grpc.ClientConn, error)
@@ -53,7 +59,7 @@ func SetupGRPCServer(t *testing.T) (pb.PointServerClient, *grpc.ClientConn, *buf
 	}()
 
 	conn, err := grpc.NewClient(
-		"bufnet",
+		"passthrough:///bufnet",
 		grpc.WithContextDialer(func(ctx context.Context, s string) (net.Conn, error) {
 			return listener.Dial()
 		}),
