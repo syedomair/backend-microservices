@@ -34,3 +34,25 @@ func (p *dbRepo) GetUserPointDB(userID string) (int, error) {
 	p.logger.Debug("method end", zap.String("method_name", methodName), zap.Duration("since", time.Since(start)))
 	return points.Points, nil
 }
+
+// GetUserListPointsDB Public
+func (p *dbRepo) GetUserListPointsDB(userIDs []string) (map[string]int32, error) {
+	methodName := "GetUserListPointsDB"
+	p.logger.Debug("method start", zap.String("method_name", methodName))
+	start := time.Now()
+
+	points := []models.Points{}
+	if err := p.client.
+		Where("user_id in (?)", userIDs).
+		Find(&points).Error; err != nil {
+		return nil, nil
+	}
+
+	mapUserPoints := make(map[string]int32)
+	for _, userPoint := range points {
+		mapUserPoints[userPoint.UserID] = int32(userPoint.Points)
+	}
+
+	p.logger.Debug("method end", zap.String("method_name", methodName), zap.Duration("since", time.Since(start)))
+	return mapUserPoints, nil
+}

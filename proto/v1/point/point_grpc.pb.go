@@ -19,7 +19,8 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	PointServer_GetUserPoints_FullMethodName = "/point.PointServer/GetUserPoints"
+	PointServer_GetUserPoints_FullMethodName     = "/point.PointServer/GetUserPoints"
+	PointServer_GetUserListPoints_FullMethodName = "/point.PointServer/GetUserListPoints"
 )
 
 // PointServerClient is the client API for PointServer service.
@@ -27,6 +28,7 @@ const (
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 type PointServerClient interface {
 	GetUserPoints(ctx context.Context, in *PointRequest, opts ...grpc.CallOption) (*PointReply, error)
+	GetUserListPoints(ctx context.Context, in *UserListRequest, opts ...grpc.CallOption) (*UserListPointResponse, error)
 }
 
 type pointServerClient struct {
@@ -47,11 +49,22 @@ func (c *pointServerClient) GetUserPoints(ctx context.Context, in *PointRequest,
 	return out, nil
 }
 
+func (c *pointServerClient) GetUserListPoints(ctx context.Context, in *UserListRequest, opts ...grpc.CallOption) (*UserListPointResponse, error) {
+	cOpts := append([]grpc.CallOption{grpc.StaticMethod()}, opts...)
+	out := new(UserListPointResponse)
+	err := c.cc.Invoke(ctx, PointServer_GetUserListPoints_FullMethodName, in, out, cOpts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
 // PointServerServer is the server API for PointServer service.
 // All implementations must embed UnimplementedPointServerServer
 // for forward compatibility.
 type PointServerServer interface {
 	GetUserPoints(context.Context, *PointRequest) (*PointReply, error)
+	GetUserListPoints(context.Context, *UserListRequest) (*UserListPointResponse, error)
 	mustEmbedUnimplementedPointServerServer()
 }
 
@@ -64,6 +77,9 @@ type UnimplementedPointServerServer struct{}
 
 func (UnimplementedPointServerServer) GetUserPoints(context.Context, *PointRequest) (*PointReply, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method GetUserPoints not implemented")
+}
+func (UnimplementedPointServerServer) GetUserListPoints(context.Context, *UserListRequest) (*UserListPointResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method GetUserListPoints not implemented")
 }
 func (UnimplementedPointServerServer) mustEmbedUnimplementedPointServerServer() {}
 func (UnimplementedPointServerServer) testEmbeddedByValue()                     {}
@@ -104,6 +120,24 @@ func _PointServer_GetUserPoints_Handler(srv interface{}, ctx context.Context, de
 	return interceptor(ctx, in, info, handler)
 }
 
+func _PointServer_GetUserListPoints_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(UserListRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(PointServerServer).GetUserListPoints(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: PointServer_GetUserListPoints_FullMethodName,
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(PointServerServer).GetUserListPoints(ctx, req.(*UserListRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
 // PointServer_ServiceDesc is the grpc.ServiceDesc for PointServer service.
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
@@ -114,6 +148,10 @@ var PointServer_ServiceDesc = grpc.ServiceDesc{
 		{
 			MethodName: "GetUserPoints",
 			Handler:    _PointServer_GetUserPoints_Handler,
+		},
+		{
+			MethodName: "GetUserListPoints",
+			Handler:    _PointServer_GetUserListPoints_Handler,
 		},
 	},
 	Streams:  []grpc.StreamDesc{},

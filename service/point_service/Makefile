@@ -10,6 +10,8 @@ run_main:
 clean_docker:
 	clear
 	docker container rm -f $$(docker ps -aq)
-	docker rmi bmc-user_service
-	docker rmi bmc-department_service
+	docker rmi bmc-point_service
 
+
+test: 
+	go test ./...
