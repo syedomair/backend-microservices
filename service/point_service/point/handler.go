@@ -7,12 +7,12 @@ import (
 	"strconv"
 	"time"
 
+	grpc_prometheus "github.com/grpc-ecosystem/go-grpc-prometheus"
 	"github.com/pkg/errors"
-	"go.uber.org/zap"
-	"google.golang.org/grpc"
-
 	"github.com/syedomair/backend-microservices/lib/container"
 	pb "github.com/syedomair/backend-microservices/proto/v1/point"
+	"go.uber.org/zap"
+	"google.golang.org/grpc"
 )
 
 var (
@@ -102,7 +102,16 @@ func NewServer(c container.Container) (Server, error) {
 	}
 
 	server.handler = handler
-	server.grpcServer = grpc.NewServer()
+
+	s := grpc.NewServer(
+		grpc.ChainUnaryInterceptor(
+			grpc_prometheus.UnaryServerInterceptor,
+		),
+	)
+	grpc_prometheus.Register(s)
+	server.grpcServer = s
+
+	//server.grpcServer = grpc.NewServer()
 	pb.RegisterPointServerServer(server.grpcServer, handler)
 
 	return server, nil
