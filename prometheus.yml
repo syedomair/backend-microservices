@@ -1,0 +1,27 @@
+global:
+  scrape_interval: 15s
+
+scrape_configs:
+  - job_name: "nginx"
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["reverse-proxy:80"]
+
+  - job_name: "user-service"
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["user_service:8185"]
+
+  - job_name: "department-service"
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["department_service:8185"]
+
+  - job_name: "point-service"
+    metrics_path: /metrics
+    static_configs:
+      - targets: ["point_service:8185"]
+    scheme: http
+    tls_config:
+      insecure_skip_verify: true
+
