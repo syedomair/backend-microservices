@@ -8,6 +8,8 @@ import (
 	"github.com/go-chi/chi"
 	"github.com/go-chi/chi/middleware"
 	"github.com/google/uuid"
+	"github.com/prometheus/client_golang/prometheus"
+	"github.com/prometheus/client_golang/prometheus/promhttp"
 	"go.uber.org/zap"
 )
 
@@ -31,6 +33,27 @@ const (
 	RequestIDKey contextKey = "requestID"
 )
 
+var (
+	httpRequestsTotal = prometheus.NewCounterVec(
+		prometheus.CounterOpts{
+			Name: "http_requests_total",
+			Help: "Total HTTP requests",
+		},
+		[]string{"method", "endpoint", "status"},
+	)
+
+	httpDuration = prometheus.NewHistogramVec(
+		prometheus.HistogramOpts{
+			Name: "http_response_time_seconds",
+			Help: "HTTP response time distribution",
+		},
+		[]string{"endpoint"},
+	)
+)
+
+func init() {
+	prometheus.MustRegister(httpRequestsTotal, httpDuration)
+}
 func NewRouter(logger *zap.Logger, routes []EndPoint) *chi.Mux {
 	router := chi.NewRouter()
 
@@ -44,6 +67,7 @@ func NewRouter(logger *zap.Logger, routes []EndPoint) *chi.Mux {
 
 	// Custom middleware
 	router.Use(loggingMiddleware(logger))
+	router.Use(prometheusMiddleware)
 
 	// Routes
 	router.Route("/v1", func(r chi.Router) {
@@ -56,6 +80,9 @@ func NewRouter(logger *zap.Logger, routes []EndPoint) *chi.Mux {
 	router.Get("/health", func(w http.ResponseWriter, r *http.Request) {
 		w.WriteHeader(http.StatusOK)
 	})
+
+	// Prometheus metrics endpoint
+	router.Handle("/metrics", promhttp.Handler())
 
 	return router
 }
@@ -84,4 +111,18 @@ func loggingMiddleware(logger *zap.Logger) func(next http.Handler) http.Handler 
 			)
 		})
 	}
+}
+
+func prometheusMiddleware(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
+		start := time.Now()
+		ww := middleware.NewWrapResponseWriter(w, r.ProtoMajor)
+		next.ServeHTTP(ww, r)
+
+		duration := time.Since(start)
+		endpoint := r.URL.Path
+
+		httpRequestsTotal.WithLabelValues(r.Method, endpoint, string(rune(ww.Status()))).Inc()
+		httpDuration.WithLabelValues(endpoint).Observe(duration.Seconds())
+	})
 }
