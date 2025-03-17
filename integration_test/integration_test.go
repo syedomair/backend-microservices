@@ -4,16 +4,25 @@ import (
 	"context"
 	"crypto/rand"
 	"database/sql"
+	"encoding/json"
 	"fmt"
 	"log"
+	"net/http"
+	"net/http/httptest"
 	"os"
 	"strings"
 	"testing"
 
 	_ "github.com/lib/pq"
+	"github.com/stretchr/testify/assert"
 	"github.com/syedomair/backend-microservices/lib/container"
+	"github.com/syedomair/backend-microservices/lib/mockgrpc"
+	"github.com/syedomair/backend-microservices/service/department_service/department"
+	"github.com/syedomair/backend-microservices/service/user_service/user"
 	"github.com/testcontainers/testcontainers-go"
 	"github.com/testcontainers/testcontainers-go/wait"
+	"go.uber.org/zap"
+	"google.golang.org/grpc"
 )
 
 func TestMain(m *testing.M) {
@@ -137,11 +146,55 @@ func randString(n int) string {
 	return fmt.Sprintf("%x", b)[:n]
 }
 
-/*
-func TestUserRepo(t *testing.T) {
+func TestDepartmentAPI(t *testing.T) {
 	c := setupTestDB(t)
-*/
-/*
+	departmentRepo := department.NewDBRepository(c.Db(), c.Logger())
+
+	limit := 10
+	offset := 0
+	orderby := "name"
+	sort := "asc"
+
+	departmentDB, count, err := departmentRepo.GetAllDepartmentDB(limit, offset, orderby, sort)
+
+	// Assertions
+	assert.NoError(t, err)
+	assert.Equal(t, 3, len(departmentDB))
+	assert.Equal(t, "3", count)
+
+	mockRepo := departmentRepo
+	mockLogger := zap.NewNop()
+
+	controller := &department.Controller{
+		Repo:   mockRepo,
+		Logger: mockLogger,
+	}
+
+	req, err := http.NewRequest("GET", "/departments", nil)
+	assert.NoError(t, err)
+
+	rr := httptest.NewRecorder()
+
+	// Act
+	controller.GetAllDepartments(rr, req)
+
+	assert.Equal(t, http.StatusOK, rr.Code)
+	assert.NoError(t, err)
+	assert.Equal(t, "application/json;charset=utf-8", rr.Header().Get("Content-Type"))
+
+	var response map[string]interface{}
+	err = json.NewDecoder(rr.Body).Decode(&response)
+	assert.NoError(t, err)
+	assert.Equal(t, "success", response["result"])
+	data := response["data"].(map[string]interface{})
+	departments := data["List"].([]interface{})
+	department := departments[0].(map[string]interface{})
+	assert.Equal(t, "Finance", department["name"])
+
+}
+
+func TestUserAPI(t *testing.T) {
+	c := setupTestDB(t)
 	userRepo := user.NewDBRepository(c.Db(), c.Logger())
 
 	limit := 10
@@ -149,37 +202,65 @@ func TestUserRepo(t *testing.T) {
 	orderby := "name"
 	sort := "asc"
 
-	users, count, err := userRepo.GetAllUserDB(limit, offset, orderby, sort)
+	usersDB, count, err := userRepo.GetAllUserDB(limit, offset, orderby, sort)
 
 	// Assertions
 	assert.NoError(t, err)
-	assert.Equal(t, 9, len(users))
+	assert.Equal(t, 9, len(usersDB))
 	assert.Equal(t, "9", count)
-*/
 
-/*
 	mockRepo := userRepo
 	mockLogger := zap.NewNop()
 
-	controller := &user.Controller{
-		Repo:   mockRepo,
-		Logger: mockLogger,
+	_, conn, _ := mockgrpc.SetupGRPCServer(t)
+	defer conn.Close()
+
+	mockConnectionPool := &mockgrpc.MockConnectionPool{
+		GetFunc: func() (*grpc.ClientConn, error) {
+			return conn, nil
+		},
+		PutFunc: func(conn *grpc.ClientConn) {
+		},
 	}
-*/
 
-/*
-	result, err := controller.GetAllUsersData(10, 0, "name", "asc")
+	controller := &user.Controller{
+		Repo:                       mockRepo,
+		Logger:                     mockLogger,
+		PointServiceConnectionPool: mockConnectionPool,
+	}
 
+	req, err := http.NewRequest("GET", "/users", nil)
 	assert.NoError(t, err)
-	assert.Equal(t, 8, len(result))
 
-	assert.Equal(t, "40", result["HighAge"].(string))
-	assert.Equal(t, "22", result["LowAge"].(string))
-	assert.Equal(t, "90000.00", result["HighSalary"].(string))
-	assert.Equal(t, "48000.00", result["LowSalary"].(string))
-	assert.Equal(t, "31.22", result["AvgAge"].(string))
-	assert.Equal(t, "68333.33", result["AvgSalary"].(string))
-	assert.Equal(t, "9", result["Count"].(string))
-*/
+	rr := httptest.NewRecorder()
 
-//}
+	// Act
+	controller.GetAllUsers(rr, req)
+
+	assert.Equal(t, http.StatusOK, rr.Code)
+	assert.NoError(t, err)
+	assert.Equal(t, "application/json;charset=utf-8", rr.Header().Get("Content-Type"))
+
+	var response map[string]interface{}
+	err = json.NewDecoder(rr.Body).Decode(&response)
+	assert.NoError(t, err)
+	assert.Equal(t, "success", response["result"])
+
+	data := response["data"].(map[string]interface{})
+	assert.Equal(t, "40", data["HighAge"])
+	assert.Equal(t, "22", data["LowAge"])
+	assert.Equal(t, "31.22", data["AvgAge"])
+	assert.Equal(t, "90000.00", data["HighSalary"])
+	assert.Equal(t, "48000.00", data["LowSalary"])
+	assert.Equal(t, "68333.33", data["AvgSalary"])
+	assert.Equal(t, "9", data["Count"])
+
+	users := data["List"].([]interface{})
+	assert.Equal(t, 9, len(users))
+
+	user := users[0].(map[string]interface{})
+	assert.Equal(t, "Alice Johnson", user["name"])
+	assert.Equal(t, float64(30), user["age"])
+	assert.Equal(t, 60000.0, user["salary"])
+	assert.Equal(t, float64(0), user["point"])
+}

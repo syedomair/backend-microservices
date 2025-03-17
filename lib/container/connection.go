@@ -6,7 +6,6 @@ import (
 
 	"google.golang.org/grpc"
 	"google.golang.org/grpc/credentials/insecure"
-	//pb "your_protobuf_package" // Replace with your protobuf package
 )
 
 type ConnectionPoolInterface interface {
@@ -44,7 +43,6 @@ func (p *ConnectionPool) Get() (*grpc.ClientConn, error) {
 		p.mu.Lock()
 		defer p.mu.Unlock()
 		if p.active < p.maxSize {
-			//conn, err := grpc.Dial(p.target, grpc.WithTransportCredentials(insecure.NewCredentials()))
 			conn, err := grpc.NewClient(p.target, grpc.WithTransportCredentials(insecure.NewCredentials()))
 			if err != nil {
 				return nil, fmt.Errorf("failed to dial: %v", err)
