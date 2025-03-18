@@ -3,6 +3,7 @@ package user
 import (
 	"context"
 	"fmt"
+	"strconv"
 	"time"
 
 	"github.com/syedomair/backend-microservices/lib/container"
@@ -63,25 +64,25 @@ func (u *UserService) GetAllUserStatistics(limit, offset int, orderBy, sort stri
 
 		client := pb.NewPointServerClient(conn)
 
-		userIDs := []string{}
 		for _, user := range userList {
-			userIDs = append(userIDs, user.ID)
-		}
+			u.logger.Debug("fetch user points", zap.String("user_id", user.ID))
 
-		ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
-		defer cancel()
+			ctx, cancel := context.WithTimeout(context.Background(), 5*time.Second)
+			defer cancel()
 
-		r, err := client.GetUserListPoints(ctx, &pb.UserListRequest{UserIds: userIDs})
-		if err != nil {
-			u.logger.Error("failed to get points for users", zap.Error(err), zap.Any("userIDs", userIDs))
-			return err
-		}
-		userPoints := r.GetUserPoints()
-		for k, v := range userPoints {
-			u.logger.Debug("user points", zap.String("user_id", k), zap.Any("points", v))
-		}
+			r, err := client.GetUserPoints(ctx, &pb.PointRequest{UserId: user.ID})
+			if err != nil {
+				u.logger.Error("failed to get user points", zap.Error(err), zap.String("userID", user.ID))
+				continue
+			}
+			u.logger.Debug("user points", zap.String("user_id", user.ID), zap.String("user points", r.GetUserPoint()))
 
-		userList = updateUserListWithPoints(userList, userPoints)
+			point, err := strconv.Atoi(r.GetUserPoint())
+			if err != nil {
+				point = 0
+			}
+			user.Point = point
+		}
 
 		return nil
 

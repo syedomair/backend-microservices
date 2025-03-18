@@ -18,7 +18,7 @@ type MockPointServiceClient struct {
 }
 
 func (m *MockPointServiceClient) GetUserPoints(ctx context.Context, in *pb.PointRequest) (*pb.PointReply, error) {
-	return &pb.PointReply{UserPoint: "100"}, nil
+	return &pb.PointReply{UserPoint: "10"}, nil
 }
 func (m *MockPointServiceClient) GetUserListPoints(ctx context.Context, in *pb.UserListRequest) (*pb.UserListPointResponse, error) {
 	mapUserPoints := make(map[string]int32)
