@@ -21,7 +21,7 @@ services:
       - .:/app
       - /var/run/docker.sock:/var/run/docker.sock
     command: >
-      sh -c " go mod tidy && go test -v ./integration_test/... ./lib/... "
+      sh -c " go mod tidy && go test -v ./integration_test/...  "
 
   user_service:
     env_file: .env_local
