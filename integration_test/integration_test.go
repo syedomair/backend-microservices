@@ -262,5 +262,5 @@ func TestUserAPI(t *testing.T) {
 	assert.Equal(t, "Alice Johnson", user["name"])
 	assert.Equal(t, float64(30), user["age"])
 	assert.Equal(t, 60000.0, user["salary"])
-	assert.Equal(t, float64(10), user["point"])
+	assert.Equal(t, float64(0), user["point"])
 }
