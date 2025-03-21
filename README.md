@@ -33,5 +33,8 @@ The repository includes CI/CD workflows located in `.github/workflows`, which au
 ### Design Patterns and Architectural Choices
 - **Singleton Pattern**: Utilized in `lib/container/container.go` to ensure that only one instance of the container is created, managing logging, database connections, and environment variables efficiently.
 
+- ** **
+- ** **
+
 ## Conclusion
 This microservices architecture not only demonstrates best practices in software design but also incorporates essential features for modern application development, such as CI/CD, performance monitoring, and robust testing frameworks. By leveraging these technologies, developers can build scalable, maintainable, and high-performing applications.
