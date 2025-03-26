@@ -14,6 +14,35 @@ This design promotes modularity and scalability across the services.
 
 ## Key Features
 
+### Architectural Patterns & Design Choices
+* **Concurrency Pattern:**
+    * Utilized in [service/user_service/user/user_service](https://github.com/syedomair/backend-microservices/blob/main/service/user_service/user/user_serivce.go) to execute multiple database queries and gRPC calls concurrently using Go's `errgroup`.
+    * Enhances the performance of the `GetAllUserStatistics` method by leveraging parallel processing.
+* **Dependency Injection Pattern:**
+    * Utilized in [lib/container/container.go](https://github.com/syedomair/backend-microservices/blob/main/lib/container/container.go) to manage logging, database connections, and environment variables.
+    * Promotes modularity and flexibility by injecting dependencies into a central container.
+* **Singleton Pattern:**
+    * Implemented in [lib/container/container.go](https://github.com/syedomair/backend-microservices/blob/main/lib/container/container.go) through synchronized lazy initialization (`sync.Mutex` + instance check) in `PostgresAdapter` and `MySQLAdapter`.
+    * Ensures only one database connection instance is created per adapter while maintaining thread safety.
+* **Adapter Pattern:**
+    * Used in [lib/container/container.go](https://github.com/syedomair/backend-microservices/blob/main/lib/container/container.go) to create a unified database interface (`Db`) with concrete implementations (`PostgresAdapter` and `MySQLAdapter`).
+    * Enables seamless switching between database providers without modifying client code.
+* **Factory Pattern:**
+    * Utilized in [lib/container/db.go](https://github.com/syedomair/backend-microservices/blob/main/lib/container/db.go) through the `NewDBConnectionAdapter` function.
+    * Acts as a factory method to create instances of different database adapters based on the specified database type, encapsulating object creation logic.
+* **External Configuration Pattern:**
+    * Utilized in [lib/container/container.go](https://github.com/syedomair/backend-microservices/blob/main/lib/container/container.go) to manage and validate essential configuration through environment variables.
+    * Ensures centralized and type-safe access to settings, promoting flexibility and ease of deployment.
+* **Decorator Pattern:**
+    * Utilized in [lib/response/response.go](https://github.com/syedomair/backend-microservices/blob/main/lib/response/response.go) to dynamically add behaviors to response handlers.
+    * Allows setting headers or handling different response types without altering the underlying handler implementation.
+* **Middleware Pattern:**
+    * Utilized in [lib/router/router.go](https://github.com/syedomair/backend-microservices/blob/main/lib/router/router.go) to chain multiple handlers that add functionalities like logging, request ID management, and Prometheus metrics collection.
+    * Enhances the HTTP request processing pipeline with modular and reusable components.
+* **Object Pool Pattern:**
+    * Implemented in [lib/container/connection.go](https://github.com/syedomair/backend-microservices/blob/main/lib/container/connection.go) to manage a pool of reusable gRPC client connections.
+    * Optimizes resource usage and improves performance by reducing the overhead of repeatedly creating and destroying connections.
+    
 ### CI/CD Integration:
 The repository includes CI/CD workflows located in `.github/workflows`, which automate the deployment process to AWS Elastic Container Registry (ECR) and Elastic Container Service (ECS) servers. This ensures seamless updates and efficient management of service deployments.
 
@@ -30,24 +59,6 @@ The repository includes CI/CD workflows located in `.github/workflows`, which au
 - **Unit Testing**: 
   Comprehensive unit tests cover all code components, ensuring high code quality and reliability. Each service is rigorously tested to validate functionality and catch potential issues early in the development cycle.
 
-### Design Patterns and Architectural Choices
-- **Concurrency Pattern**: Utilized in `service/user_service/user/user_service` to execute multiple database queries and gRPC calls concurrently using Go's errgroup, enhancing the performance of the GetAllUserStatistics method by leveraging parallel processing.
-
-- **Dependency Injection Pattern**: Utilized in `lib/container/container.go` to manage logging, database connections, and environment variables by injecting these dependencies into a central container, promoting modularity and flexibility in the application architecture.
-
-- **Singleton Pattern**: Implemented in `lib/container/db.go` through synchronized lazy initialization (sync.Mutex + instance check) in PostgresAdapter and MySQLAdapter, ensuring only one database connection instance is created per adapter while maintaining thread safety.
-
-- **Adapter Pattern**: Used in `lib/container/db.go` to create a unified database interface (Db) with concrete implementations (PostgresAdapter and MySQLAdapter), enabling seamless switching between database providers without modifying client code.
-
-- **Factory Pattern**: Utilized in `lib/container/db.go` through the NewDBConnectionAdapter function, which acts as a factory method to create instances of different database adapters (PostgresAdapter, MySQLAdapter) based on the specified database type, encapsulating object creation logic and promoting flexibility in database provider selection.
-
-- **External Configuration Pattern**: Utilized in `lib/container/container.go` to manage and validate essential configuration through environment variables, ensuring centralized and type-safe access to settings while promoting flexibility and ease of deployment across different environments.
-
-- **Decorator Pattern**: Utilized in `lib/response/response.go` to dynamically add behaviors to response handlers, such as setting headers or handling different response types, without altering the underlying handler implementation.
-
-- **Middleware Pattern**: Utilized in `lib/router/router.go` to chain multiple handlers that add functionalities like logging, request ID management, and Prometheus metrics collection, enhancing the HTTP request processing pipeline with modular and reusable components. 
-
-- **Object Pool Pattern**: Implemented in `lib/container/connection.go` to manage a pool of reusable gRPC client connections, optimizing resource usage and improving performance by reducing the overhead of repeatedly creating and destroying connections.
 
 ## Conclusion
 This microservices architecture not only demonstrates best practices in software design but also incorporates essential features for modern application development, such as CI/CD, performance monitoring, and robust testing frameworks. By leveraging these technologies, developers can build scalable, maintainable, and high-performing applications.
