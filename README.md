@@ -4,11 +4,11 @@ This repository showcases a robust microservices architecture comprising three d
 
 ## Services
 - Department Service:
-  Exposes a REST API endpoint: `/api/departments/v1/departments` for retrieving department data.
+  Exposes a **REST** API endpoint: `/api/departments/v1/departments` for retrieving department data.
 - User Service:
-  Provides a REST API endpoint: `/api/users/v1/users` for accessing user information.
+  Provides a **REST** API endpoint: `/api/users/v1/users` for accessing user information.
 - Point Service:
-  Utilizes gRPC to deliver user point data, which is consumed by the User service, effectively demonstrating inter-service communication.
+  Utilizes **gRPC** to deliver user point data, which is consumed by the User service, effectively demonstrating inter-service communication.
 
 This design promotes modularity and scalability across the services.
 
