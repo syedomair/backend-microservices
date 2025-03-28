@@ -2,13 +2,13 @@
 
 This repository showcases a robust microservices architecture comprising three distinct services: **Department**, **User**, and **Point**. The project emphasizes code reusability through a common container that initializes essential components such as logging, database connections, and environment variables.
 
-## Services
+### API Services
 - Department Service:
-  Exposes a REST API endpoint: `/api/departments/v1/departments` for retrieving department data.
+  Exposes a **REST** API endpoint: `/api/departments/v1/departments` for retrieving department data.
 - User Service:
-  Provides a REST API endpoint: `/api/users/v1/users` for accessing user information.
+  Provides a **REST** API endpoint: `/api/users/v1/users` for accessing user information.
 - Point Service:
-  Utilizes gRPC to deliver user point data, which is consumed by the User service, effectively demonstrating inter-service communication.
+  Utilizes **gRPC** to deliver user point data, which is consumed by the User service, effectively demonstrating inter-service communication.
 
 This design promotes modularity and scalability across the services.
 
@@ -58,7 +58,6 @@ The repository includes CI/CD workflows located in `.github/workflows`, which au
 
 - **Unit Testing**: 
   Comprehensive unit tests cover all code components, ensuring high code quality and reliability. Each service is rigorously tested to validate functionality and catch potential issues early in the development cycle.
-
 
 ## Conclusion
 This microservices architecture not only demonstrates best practices in software design but also incorporates essential features for modern application development, such as CI/CD, performance monitoring, and robust testing frameworks. By leveraging these technologies, developers can build scalable, maintainable, and high-performing applications.
