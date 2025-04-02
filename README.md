@@ -59,7 +59,7 @@ The repository includes CI/CD workflows located in `.github/workflows`, which au
 
 - **Unit Testing**: 
   Comprehensive unit tests cover all code components, ensuring high code quality and reliability. Each service is rigorously tested to validate functionality and catch potential issues early in the development cycle.
-
+---
 ## Conclusion
 This microservices architecture not only demonstrates best practices in software design but also incorporates essential features for modern application development, such as CI/CD, performance monitoring, and robust testing frameworks. By leveraging these technologies, developers can build scalable, maintainable, and high-performing applications.
 
