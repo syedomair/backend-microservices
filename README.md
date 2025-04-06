@@ -1,7 +1,4 @@
 # Repository Overview
----
-
-
 This repository showcases a robust microservices architecture comprising three distinct services: **Department**, **User**, and **Point**. The project emphasizes code reusability through a common container that initializes essential components such as logging, database connections, and environment variables.
 
 ### API Services
@@ -63,6 +60,6 @@ The repository includes CI/CD workflows located in `.github/workflows`, which au
 ---
 ## Conclusion
 This microservices architecture not only demonstrates best practices in software design but also incorporates essential features for modern application development, such as CI/CD, performance monitoring, and robust testing frameworks. By leveraging these technologies, developers can build scalable, maintainable, and high-performing applications.
----
+
 
 
