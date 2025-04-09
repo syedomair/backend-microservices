@@ -12,7 +12,7 @@ This repository showcases a robust microservices architecture comprising three d
 This design promotes modularity and scalability across the services.
 
 ## Key Features
-
+ 
 ### Architectural Patterns & Design Choices
 * **Concurrency Pattern:**
     * Utilized in [service/user_service/user/user_service](https://github.com/syedomair/backend-microservices/blob/main/service/user_service/user/user_serivce.go) to execute multiple database queries and gRPC calls concurrently using Go's `errgroup`.
