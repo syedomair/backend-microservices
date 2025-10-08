@@ -20,10 +20,6 @@ graph TB
         C --> E[(User DB)]
         C -- gRPC --> G[Point Service]
         G --> H[(Point DB)]
-        C --> I[Prometheus]
-        D --> I[Prometheus]
-        G --> I[Prometheus]
-        I --> J[Grafana]
         B --> D[Department Service]
         D --> F[(Department DB)]
     end
