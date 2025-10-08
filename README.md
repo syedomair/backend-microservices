@@ -1,41 +1,19 @@
-# Distributed Microservices Demo in Go
-
-A cloud-native, production-ready demonstration of a distributed system built with Go. This project features three containerized microservices (REST & gRPC) communicating over a network, backed by PostgreSQL, deployed via CI/CD to AWS ECS, and fully monitored with Prometheus and Grafana.
-
-# Demo
-**Run Locally:**
-```bash
-make run_docker
-```
-Prerequisites: Docker and Docker Compose must be installed on your machine.
+# Repository Overview
+This repository showcases a robust microservices architecture comprising three distinct services: **Department**, **User**, and **Point**. The project emphasizes code reusability through a common container that initializes essential components such as logging, database connections, and environment variables.
 
 
-# Architecture Overview
+### API Services
+- Department Service:
+  Exposes a **REST** API endpoint: `/api/departments/v1/departments` for retrieving department data.
+- User Service:
+  Provides a **REST** API endpoint: `/api/users/v1/users` for accessing user information.
+- Point Service:
+  Utilizes **gRPC** to deliver user point data, which is consumed by the User service, effectively demonstrating inter-service communication.
 
-```mermaid
-graph TB
-    subgraph AWS ECS / Docker Compose
-        A[Client] --> B[API Gateway]
-        B --> C[User Service]
-        C --> E[(User DB)]
-        C -- gRPC --> G[Point Service]
-        G --> H[(Point DB)]
-        C --> I[Prometheus]
-        D --> I[Prometheus]
-        G --> I[Prometheus]
-        I --> J[Grafana]
-        B --> D[Department Service]
-        D --> F[(Department DB)]
-    end
-``` 
 
-# Technology Stack 
-Go, PostgreSQL, Docker, gRPC, Prometheus, Grafana, GitHub Action
-
-# Key Features
-
-### 🏗️ Architecture & Design Patterns
-This project is a textbook example of practical software engineering patterns in Go:
+## Key Features
+ 
+### Architectural Patterns & Design Choices
 * **Concurrency Pattern:**
     * Utilized in [service/user_service/user/user_service](https://github.com/syedomair/backend-microservices/blob/main/service/user_service/user/user_service.go) to execute multiple database queries and gRPC calls concurrently using Go's `errgroup`.
     * Enhances the performance of the `GetAllUserStatistics` method by leveraging parallel processing.
@@ -79,7 +57,14 @@ This project is a textbook example of practical software engineering patterns in
 *   **RESTful APIs:** JSON over HTTP for `user-service` (`/users`) and `department-service` (`/departments`).
 *   **gRPC:** High-performance RPC for internal communication between `user-service` and `point-service`.
 
+- **Unit Testing**: 
+  Comprehensive unit tests cover all code components, ensuring high code quality and reliability. Each service is rigorously tested to validate functionality and catch potential issues early in the development cycle.
+---
+## Conclusion
+This microservices architecture not only demonstrates best practices in software design but also incorporates essential features for modern application development, such as CI/CD, performance monitoring, and robust testing frameworks. By leveraging these technologies, developers can build scalable, maintainable, and high-performing applications.
 ---
 
-# Conclusion
-This microservices architecture not only demonstrates best practices in software design but also incorporates essential features for modern application development, such as CI/CD, performance monitoring, and robust testing frameworks. By leveraging these technologies, developers can build scalable, maintainable, and high-performing applications.
+---
+
+
+
