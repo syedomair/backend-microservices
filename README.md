@@ -10,13 +10,12 @@ This repository showcases a robust microservices architecture comprising three d
 - Point Service:
   Utilizes **gRPC** to deliver user point data, which is consumed by the User service, effectively demonstrating inter-service communication.
 
-This design promotes modularity and scalability across the services.
 
 ## Key Features
  
 ### Architectural Patterns & Design Choices
 * **Concurrency Pattern:**
-    * Utilized in [service/user_service/user/user_service](https://github.com/syedomair/backend-microservices/blob/main/service/user_service/user/user_serivce.go) to execute multiple database queries and gRPC calls concurrently using Go's `errgroup`.
+    * Utilized in [service/user_service/user/user_service](https://github.com/syedomair/backend-microservices/blob/main/service/user_service/user/user_service.go) to execute multiple database queries and gRPC calls concurrently using Go's `errgroup`.
     * Enhances the performance of the `GetAllUserStatistics` method by leveraging parallel processing.
 * **Dependency Injection Pattern:**
     * Utilized in [lib/container/container.go](https://github.com/syedomair/backend-microservices/blob/main/lib/container/container.go) to manage logging, database connections, and environment variables.
@@ -43,18 +42,20 @@ This design promotes modularity and scalability across the services.
     * Implemented in [lib/container/connection.go](https://github.com/syedomair/backend-microservices/blob/main/lib/container/connection.go) to manage a pool of reusable gRPC client connections.
     * Optimizes resource usage and improves performance by reducing the overhead of repeatedly creating and destroying connections.
     
-### CI/CD Integration:
-The repository includes CI/CD workflows located in `.github/workflows`, which automate the deployment process to AWS Elastic Container Registry (ECR) and Elastic Container Service (ECS) servers. This ensures seamless updates and efficient management of service deployments.
+### 🚀 Operational Excellence
+*   **CI/CD:** Automated Docker image builds and deployments to AWS ECS via GitHub Actions.
+*   **Monitoring:** Integrated Prometheus metrics and pprof profiling for real-time performance insight.
+*   **Observability:** Structured logging and request tracing throughout the services.
+*   **Containerization:** Fully dockerized for local development and cloud deployment.
 
-### Performance Monitoring
-- **Prometheus Metrics**: Integrated Prometheus metrics allow users to monitor the performance of each service in real-time. This feature provides insights into system health and resource utilization.
-  
-- **Memory Profiling with pprof**: 
-  The project includes pprof for memory monitoring, enabling developers to analyze memory usage and optimize performance effectively.
 
-### Testing Framework
-- **Integration Testing**: 
-  The system performs integration testing using a mock database running in a test Docker container. This setup ensures that all services interact correctly and maintain data integrity during operations.
+### 🧪 Testing Strategy
+*   **Unit Tests:** Comprehensive tests for all business logic and handlers.
+*   **Integration Tests:** End-to-end tests using a live test database and gRPC server within Docker, validating the entire service ecosystem.
+
+### 📡 APIs & Communication
+*   **RESTful APIs:** JSON over HTTP for `user-service` (`/users`) and `department-service` (`/departments`).
+*   **gRPC:** High-performance RPC for internal communication between `user-service` and `point-service`.
 
 - **Unit Testing**: 
   Comprehensive unit tests cover all code components, ensuring high code quality and reliability. Each service is rigorously tested to validate functionality and catch potential issues early in the development cycle.
