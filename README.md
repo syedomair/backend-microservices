@@ -36,7 +36,7 @@ Go, PostgreSQL, Docker, gRPC, Prometheus, Grafana, GitHub Action
 ### 🏗️ Architecture & Design Patterns
 This project is a textbook example of practical software engineering patterns in Go:
 * **Concurrency Pattern:**
-    * Utilized in [service/user_service/user/user_service](https://github.com/syedomair/backend-microservices/blob/main/service/user_service/user/user_service.go) to execute multiple database queries and gRPC calls concurrently using Go's `errgroup`.
+    * Utilized in [service/user_service/user/user_service](https://github.com/syedomair/backend-microservices/blob/main/service/user_service/user/user_serivce.go) to execute multiple database queries and gRPC calls concurrently using Go's `errgroup`.
     * Enhances the performance of the `GetAllUserStatistics` method by leveraging parallel processing.
 * **Dependency Injection Pattern:**
     * Utilized in [lib/container/container.go](https://github.com/syedomair/backend-microservices/blob/main/lib/container/container.go) to manage logging, database connections, and environment variables.
