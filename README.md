@@ -82,3 +82,10 @@ This project is a textbook example of practical software engineering patterns in
 
 # Conclusion
 This microservices architecture not only demonstrates best practices in software design but also incorporates essential features for modern application development, such as CI/CD, performance monitoring, and robust testing frameworks. By leveraging these technologies, developers can build scalable, maintainable, and high-performing applications.
+
+
+# Prometheus
+http://localhost:9090/query ->  http_requests_total
+
+# Grafana
+http://localhost:3001/login -> admin/admin 
