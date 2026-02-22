@@ -7,6 +7,9 @@ A cloud-native, production-ready demonstration of a distributed system built wit
 ```bash
 make run_docker
 ```
+Open your browser and go to: 
+* http://localhost:8180/api/users/v1/users
+* http://localhost:8180/api/departments/v1/departments
 Prerequisites: Docker and Docker Compose must be installed on your machine.
 
 

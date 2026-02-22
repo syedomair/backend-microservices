@@ -159,7 +159,7 @@ services:
       POSTGRES_DB: mydb
     volumes:
       - ./database/migration.sql:/docker-entrypoint-initdb.d/migration.sql
-      - db_data:/var/lib/postgresql/data
+      - db_data:/var/lib/postgresql
 
   prometheus:
     image: prom/prometheus:latest
